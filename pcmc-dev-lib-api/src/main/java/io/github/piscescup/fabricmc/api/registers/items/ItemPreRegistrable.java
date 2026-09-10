@@ -7,13 +7,11 @@ import org.jetbrains.annotations.NotNull;
 /**
  *
  * @author REN YuanTong
- * @since
+ * @since 1.0.0
  */
-public interface ItemPreRegistrable<T extends Item>
-    extends PreRegistrable<Item, T, ItemPreRegistrable<T>, ItemPostRegistrable<T>>
+public interface ItemPreRegistrable<I extends Item>
+    extends PreRegistrable<Item, I, ItemPreRegistrable<I>, ItemPostRegistrable<I>>
 {
-    @NotNull
-    ItemPreRegistrable<T> factory(@NotNull ItemFactory<T> factory);
 
-    ItemPreRegistrable<T> properties(@NotNull Item.Properties properties);
+    ItemPreRegistrable<I> properties(@NotNull Item.Properties properties);
 }

@@ -1,44 +1,38 @@
 package io.github.piscescup.fabricmc.impl.registers.items;
 
-import io.github.piscescup.fabricmc.api.registers.items.ItemFactory;
 import io.github.piscescup.fabricmc.api.registers.items.ItemPostRegistrable;
 import io.github.piscescup.fabricmc.api.registers.items.ItemPreRegistrable;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.impl.registers.Register;
 import io.github.piscescup.util.validation.NullCheck;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
+
+import java.util.function.Function;
 
 /**
  *
  * @author REN YuanTong
  * @since 1.0.0
  */
-public class ItemRegister<T extends Item>
-    extends Register<Item, T, ItemPreRegistrable<T>, ItemPostRegistrable<T>>
-    implements ItemPreRegistrable<T>, ItemPostRegistrable<T>
+public class ItemRegister<I extends Item>
+    extends Register<Item, I, ItemPreRegistrable<I>, ItemPostRegistrable<I>>
+    implements ItemPreRegistrable<I>, ItemPostRegistrable<I>
 {
-    private ItemFactory<T> itemFactory = Item::new;
+    private Function<Item.Properties, I> itemFactory;
     private Item.Properties itemProperties = new Item.Properties();
 
-    private ItemRegister(@NotNull String namespace) {
-        super(Registries.ITEM, BuiltInRegistries.ITEM, namespace);
-        NullCheck.requireNonNull(itemFactory, "itemFactory");
+    ItemRegister(@NotNull Identifier id, Function<Item.Properties, I> factory) {
+        NullCheck.requireNonNull(id, "id");
+        super(id);
+        this.itemFactory = NullCheck.requireNonNull(factory, "factory");
     }
 
-    @Override
-    public @NotNull ItemPreRegistrable<T> factory(@NotNull ItemFactory<T> factory) {
-        NullCheck.requireNonNull(factory, "factory");
-        this.itemFactory = factory;
-        return this;
-    }
 
     @Override
-    public ItemPreRegistrable<T> properties(@NotNull Item.Properties properties) {
+    public ItemPreRegistrable<I> properties(@NotNull Item.Properties properties) {
         NullCheck.requireNonNull(properties, "properties");
 
         this.itemProperties = properties;
@@ -46,7 +40,7 @@ public class ItemRegister<T extends Item>
     }
 
     @Override
-    public @NonNull ItemRegister<T> translate(@NotNull MCLanguage lang, @NotNull String translation) {
+    public @NonNull ItemRegister<I> translate(@NotNull MCLanguage lang, @NotNull String translation) {
         return this;
     }
 
@@ -57,13 +51,14 @@ public class ItemRegister<T extends Item>
      * @return the corresponding post-registration stage
      */
     @Override
-    public @NonNull ItemPostRegistrable<T> register() {
-        T item = itemFactory.cast(this.itemProperties
+    public @NonNull ItemPostRegistrable<I> register() {
+        I item = itemFactory.apply(this.itemProperties
             .setId(this.resourceKey));
 
-        this.thingToBeRegistered = Registry.register(
-            registerRegistryCategory, resourceKey, item
-        );
         return this;
+    }
+
+    public void test() {
+
     }
 }

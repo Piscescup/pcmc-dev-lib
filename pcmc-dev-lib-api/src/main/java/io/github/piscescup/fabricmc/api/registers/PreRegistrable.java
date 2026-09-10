@@ -20,14 +20,6 @@ public interface PreRegistrable<
     PRE extends PreRegistrable<V, T, PRE, POST>,
     POST extends PostRegistrable<V, T, POST>>
 {
-    /**
-     * Sets the registry path.
-     *
-     * @param path the path portion of the registry identifier
-     * @return this pre-registration stage
-     */
-    @NotNull
-    PRE path(@NotNull String path);
 
     /**
      * Registers the configured object and enters the

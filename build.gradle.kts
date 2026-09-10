@@ -112,6 +112,15 @@ project(":pcmc-dev-lib-datagen") {
 	}
 }
 
+project(":pcmc-dev-lib-test") {
+	dependencies {
+		add(
+			"implementation",
+			project(":pcmc-dev-lib-datagen")
+		)
+	}
+}
+
 tasks.register("buildAll") {
 	group = "build"
 	description = "Builds all PCMC Dev Lib modules."

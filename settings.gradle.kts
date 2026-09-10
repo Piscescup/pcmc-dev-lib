@@ -21,5 +21,6 @@ rootProject.name = "pcmc-dev-lib"
 include(
     "pcmc-dev-lib-api",
     "pcmc-dev-lib-impl",
-    "pcmc-dev-lib-datagen"
+    "pcmc-dev-lib-datagen",
+    "pcmc-dev-lib-test"
 )

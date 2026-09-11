@@ -13,7 +13,7 @@ import static io.github.piscescup.fabricmc.Refs.MOD_LOGGER;
  * @since 1.0.0
  */
 public class TestItems {
-    private static final ItemRegisterFactory ITEMS = ItemRegisterFactory.of(MOD_ID);
+    private static final ItemRegisterFactory ITEMS = ItemRegisterFactory.ofNamespace(MOD_ID);
 
     public static final Item ITEM1 = ITEMS.pathSimple("item1")
         .properties(new Item.Properties())

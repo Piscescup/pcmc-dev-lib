@@ -29,7 +29,7 @@ public class ItemRegisterFactory extends RegisterFactoryImpl<Item> {
 
     @Contract("_ -> new")
     @NotNull
-    public static ItemRegisterFactory of(@NotNull String namespace) {
+    public static ItemRegisterFactory ofNamespace(@NotNull String namespace) {
         return new ItemRegisterFactory(namespace);
     }
 

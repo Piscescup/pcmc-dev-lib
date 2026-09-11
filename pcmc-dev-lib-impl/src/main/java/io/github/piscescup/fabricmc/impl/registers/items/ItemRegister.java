@@ -32,7 +32,6 @@ public class ItemRegister<I extends Item>
         this.itemFactory = NullCheck.requireNonNull(factory, "factory");
     }
 
-
     @Override
     public ItemPreRegistrable<I> properties(@NotNull Item.Properties properties) {
         NullCheck.requireNonNull(properties, "properties");

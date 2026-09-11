@@ -1,7 +1,8 @@
-package io.github.piscescup.fabricmc.impl.registers.item;
+package io.github.piscescup.fabricmc.impl.registers.items;
 
-import io.github.piscescup.fabricmc.api.registers.item.ItemPostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.item.ItemPreRegistrable;
+import io.github.piscescup.fabricmc.api.registers.items.ItemPostRegistrable;
+import io.github.piscescup.fabricmc.api.registers.items.ItemPreRegistrable;
+import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.impl.registers.Register;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.Registry;
@@ -31,6 +32,7 @@ public class ItemRegister<I extends Item>
         this.itemFactory = NullCheck.requireNonNull(factory, "factory");
     }
 
+
     @Override
     public ItemPreRegistrable<I> properties(@NotNull Item.Properties properties) {
         NullCheck.requireNonNull(properties, "properties");
@@ -40,8 +42,8 @@ public class ItemRegister<I extends Item>
     }
 
     @Override
-    protected String translateKey() {
-        return thingToBeRegistered.getDescriptionId();
+    public @NonNull ItemRegister<I> translate(@NotNull MCLanguage lang, @NotNull String translation) {
+        return this;
     }
 
     /**
@@ -56,13 +58,12 @@ public class ItemRegister<I extends Item>
             .setId(this.resourceKey));
 
         this.thingToBeRegistered = Registry.register(
-            this.registry,
+            BuiltInRegistries.ITEM,
             this.id,
             item
         );
 
         return this;
     }
-
 
 }

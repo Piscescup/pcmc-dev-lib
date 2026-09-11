@@ -1,5 +1,6 @@
 dependencies {
-    api(project(":pcmc-dev-lib-api"))
+    implementation(project(":pcmc-dev-lib-api"))
+    implementation(project(":pcmc-dev-lib-impl"))
 
     testImplementation(
         platform("org.junit:junit-bom:6.0.0")

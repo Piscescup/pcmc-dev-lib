@@ -3,14 +3,13 @@
 	"id": "pcmc-dev-lib",
 	"version": "${version}",
 	"name": "PCMC Develop Lib",
-	"description": "A util lib for Minecraft development.",
+	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
-		"REN Yuantong"
+		"Me!"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/Piscescup/pcmc-dev-lib",
-		"issues": "https://github.com/Piscescup/pcmc-dev-lib/issues"
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "Apache-2.0",
 	"icon": "assets/pcmc-dev-lib/icon.png",

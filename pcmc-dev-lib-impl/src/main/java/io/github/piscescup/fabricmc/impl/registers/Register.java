@@ -3,6 +3,7 @@ package io.github.piscescup.fabricmc.impl.registers;
 import io.github.piscescup.fabricmc.api.registers.PostRegistrable;
 import io.github.piscescup.fabricmc.api.registers.PreRegistrable;
 import io.github.piscescup.util.validation.NullCheck;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.NotNull;
@@ -22,18 +23,25 @@ public abstract class Register<
 
     protected Identifier id;
 
+    protected Registry<V> registry;
+
     protected ResourceKey<V> resourceKey;
 
     protected T thingToBeRegistered;
 
-    protected Register(Identifier id) {
-        this.id = NullCheck.requireNonNull(id, "path");
+    protected Register(Registry<V> registry, Identifier id) {
+        this.id = NullCheck.requireNonNull(id, "id");
+        this.registry = NullCheck.requireNonNull(registry, "registry");
+        this.resourceKey = ResourceKey.create(
+            registry.key(),
+            this.id
+        );
     }
 
 
     @Override
     public @NotNull ResourceKey<V> resourceKey() {
-        return null;
+        return resourceKey;
     }
 
     @Override

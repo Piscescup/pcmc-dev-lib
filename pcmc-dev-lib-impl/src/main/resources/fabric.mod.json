@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "pcmc-dev-lib-impl",
+  "version": "${version}",
+  "name": "PCMC Develop Lib Implementation",
+  "description": "Implementation of PCMC Develop Lib API.",
+  "authors": [
+    "REN YuanTong"
+  ],
+  "license": "Apache-2.0",
+  "environment": "*",
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.2",
+    "java": ">=25",
+    "pcmc-dev-lib-api": "*"
+  }
+}

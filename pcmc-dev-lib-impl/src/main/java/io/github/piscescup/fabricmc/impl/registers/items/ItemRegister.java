@@ -5,6 +5,8 @@ import io.github.piscescup.fabricmc.api.registers.items.ItemPreRegistrable;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.impl.registers.Register;
 import io.github.piscescup.util.validation.NullCheck;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +28,7 @@ public class ItemRegister<I extends Item>
 
     ItemRegister(@NotNull Identifier id, Function<Item.Properties, I> factory) {
         NullCheck.requireNonNull(id, "id");
-        super(id);
+        super(BuiltInRegistries.ITEM, id);
         this.itemFactory = NullCheck.requireNonNull(factory, "factory");
     }
 
@@ -55,10 +57,13 @@ public class ItemRegister<I extends Item>
         I item = itemFactory.apply(this.itemProperties
             .setId(this.resourceKey));
 
+        this.thingToBeRegistered = Registry.register(
+            BuiltInRegistries.ITEM,
+            this.id,
+            item
+        );
+
         return this;
     }
 
-    public void test() {
-
-    }
 }

@@ -2,7 +2,6 @@ package io.github.piscescup.fabricmc.impl.registers.block;
 
 import io.github.piscescup.fabricmc.api.registers.block.BlockPostRegistrable;
 import io.github.piscescup.fabricmc.api.registers.block.BlockPreRegistrable;
-import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.impl.registers.Register;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.Registry;
@@ -112,6 +111,11 @@ public class BlockRegister<B extends Block>
     }
 
     @Override
+    protected String translateKey() {
+        return thingToBeRegistered.getDescriptionId();
+    }
+
+    @Override
     public @NotNull Identifier blockItemId() {
         return blockItemId.item().identifier();
     }
@@ -121,8 +125,4 @@ public class BlockRegister<B extends Block>
         return this.blockItem;
     }
 
-    @Override
-    public @NotNull BlockPostRegistrable<B> translate(@NotNull MCLanguage lang, @NotNull String translation) {
-        return this;
-    }
 }

@@ -1,6 +1,7 @@
 package io.github.piscescup.fabricmc;
 
 import io.github.piscescup.fabricmc.testblocks.TestBlocks;
+import io.github.piscescup.fabricmc.testcreativetabs.TestCreativeModeTabs;
 import io.github.piscescup.fabricmc.testitems.TestItems;
 import net.fabricmc.api.ModInitializer;
 
@@ -14,5 +15,6 @@ public class TestMod implements ModInitializer {
     public void onInitialize() {
         TestItems.registerModItems();
         TestBlocks.registerModBlocks();
+        TestCreativeModeTabs.registerModCreativeTabs();
     }
 }

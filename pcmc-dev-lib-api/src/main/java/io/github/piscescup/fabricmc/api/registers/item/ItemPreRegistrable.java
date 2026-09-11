@@ -1,4 +1,4 @@
-package io.github.piscescup.fabricmc.api.registers.items;
+package io.github.piscescup.fabricmc.api.registers.item;
 
 import io.github.piscescup.fabricmc.api.registers.PreRegistrable;
 import net.minecraft.world.item.Item;

@@ -1,4 +1,4 @@
-package io.github.piscescup.fabricmc.api.registers.blocks;
+package io.github.piscescup.fabricmc.api.registers.block;
 
 import io.github.piscescup.fabricmc.api.registers.PostRegistrable;
 import net.minecraft.resources.Identifier;

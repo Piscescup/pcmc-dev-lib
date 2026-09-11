@@ -1,7 +1,7 @@
-package io.github.piscescup.fabricmc.impl.registers.blocks;
+package io.github.piscescup.fabricmc.impl.registers.block;
 
-import io.github.piscescup.fabricmc.api.registers.blocks.BlockPostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.blocks.BlockPreRegistrable;
+import io.github.piscescup.fabricmc.api.registers.block.BlockPostRegistrable;
+import io.github.piscescup.fabricmc.api.registers.block.BlockPreRegistrable;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.impl.registers.Register;
 import io.github.piscescup.util.validation.NullCheck;
@@ -91,7 +91,7 @@ public class BlockRegister<B extends Block>
             .setId(this.resourceKey));
 
         this.thingToBeRegistered = Registry.register(
-            BuiltInRegistries.BLOCK,
+            this.registry,
             this.id,
             block
         );

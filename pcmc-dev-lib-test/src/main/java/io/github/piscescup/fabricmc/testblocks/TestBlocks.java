@@ -1,7 +1,7 @@
 package io.github.piscescup.fabricmc.testblocks;
 
 import io.github.piscescup.fabricmc.constants.MCLanguage;
-import io.github.piscescup.fabricmc.impl.registers.blocks.BlockRegistryFactory;
+import io.github.piscescup.fabricmc.impl.registers.block.BlockRegistryFactory;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.PotionItem;

@@ -1,7 +1,7 @@
 package io.github.piscescup.fabricmc.testitems;
 
 import io.github.piscescup.fabricmc.constants.MCLanguage;
-import io.github.piscescup.fabricmc.impl.registers.items.ItemRegisterFactory;
+import io.github.piscescup.fabricmc.impl.registers.item.ItemRegisterFactory;
 import net.minecraft.world.item.Item;
 
 import static io.github.piscescup.fabricmc.Refs.MOD_ID;

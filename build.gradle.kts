@@ -6,7 +6,9 @@ import org.gradle.jvm.tasks.Jar
 import org.gradle.language.jvm.tasks.ProcessResources
 
 plugins {
-	id("net.fabricmc.fabric-loom") apply false
+	id("net.fabricmc.fabric-loom")
+	`java-library`
+	`maven-publish`
 }
 
 val minecraftVersion = providers.gradleProperty("minecraft_version").get()
@@ -36,12 +38,21 @@ subprojects {
 	apply(plugin = "maven-publish")
 
 	dependencies {
-		add("minecraft", "com.mojang:minecraft:$minecraftVersion")
-		add("implementation", "net.fabricmc:fabric-loader:$loaderVersion")
+		add(
+			"minecraft",
+			"com.mojang:minecraft:$minecraftVersion"
+		)
+
+		add(
+			"implementation",
+			"net.fabricmc:fabric-loader:$loaderVersion"
+		)
+
 		add(
 			"implementation",
 			"net.fabricmc.fabric-api:fabric-api:$fabricApiVersion"
 		)
+
 		add(
 			"implementation",
 			"io.github.piscescup:commons-lib:$commonsLibVersion"
@@ -66,21 +77,16 @@ subprojects {
 	}
 
 	tasks.named<ProcessResources>("processResources") {
-		val moduleVersion = project.version.toString()
-
-		inputs.property("version", moduleVersion)
+		inputs.property("version", project.version)
 
 		filesMatching("fabric.mod.json") {
-			expand("version" to moduleVersion)
+			expand("version" to project.version)
 		}
 	}
 
 	tasks.named<Jar>("jar") {
-		val moduleName = project.name
-		inputs.property("moduleName", moduleName)
-
 		from(rootProject.file("LICENSE")) {
-			rename { "${it}_$moduleName" }
+			rename { "${it}_${project.name}" }
 		}
 	}
 
@@ -94,31 +100,51 @@ subprojects {
 	}
 }
 
-project(":pcmc-dev-lib-impl") {
-	dependencies {
-		add(
-			"api",
-			project(":pcmc-dev-lib-api")
-		)
+dependencies {
+	minecraft("com.mojang:minecraft:$minecraftVersion")
+
+	implementation(
+		"net.fabricmc:fabric-loader:$loaderVersion"
+	)
+
+	implementation(
+		"net.fabricmc.fabric-api:fabric-api:$fabricApiVersion"
+	)
+
+	implementation(
+		"io.github.piscescup:commons-lib:$commonsLibVersion"
+	)
+
+	include(project(":pcmc-dev-lib-api"))
+	include(project(":pcmc-dev-lib-impl"))
+	include(project(":pcmc-dev-lib-datagen"))
+
+}
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+	}
+
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+
+	withSourcesJar()
+	withJavadocJar()
+}
+
+publishing {
+	publications {
+		register<MavenPublication>("mavenJava") {
+			from(components["java"])
+			artifactId = rootProject.name
+		}
 	}
 }
 
-project(":pcmc-dev-lib-datagen") {
-	dependencies {
-		add(
-			"implementation",
-			project(":pcmc-dev-lib-impl")
-		)
-	}
-}
-
-project(":pcmc-dev-lib-test") {
-	dependencies {
-		add(
-			"implementation",
-			project(":pcmc-dev-lib-datagen")
-		)
-	}
+tasks.withType<JavaCompile>().configureEach {
+	options.encoding = "UTF-8"
+	options.release = 25
 }
 
 tasks.register("buildAll") {
@@ -133,4 +159,12 @@ tasks.register("publishAllToMavenLocal") {
 	description = "Publishes all PCMC Dev Lib modules to Maven Local."
 
 	dependsOn(subprojects.map { "${it.path}:publishToMavenLocal" })
+}
+
+tasks.named<ProcessResources>("processResources") {
+	inputs.property("version", project.version)
+
+	filesMatching("fabric.mod.json") {
+		expand("version" to project.version)
+	}
 }

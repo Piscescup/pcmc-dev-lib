@@ -5,6 +5,7 @@ import io.github.piscescup.fabricmc.impl.registers.items.ItemRegisterFactory;
 import net.minecraft.world.item.Item;
 
 import static io.github.piscescup.fabricmc.Refs.MOD_ID;
+import static io.github.piscescup.fabricmc.Refs.MOD_LOGGER;
 
 /**
  *
@@ -27,7 +28,7 @@ public class TestItems {
         .get();
 
     public static void registerModItems() {
-
+        MOD_LOGGER.info("Registering Mod Items");
     }
 
 }

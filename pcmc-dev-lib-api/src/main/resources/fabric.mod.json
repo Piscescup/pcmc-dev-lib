@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "pcmc-dev-lib-api",
+  "version": "${version}",
+  "name": "PCMC Develop Lib API",
+  "environment": "*",
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.2",
+    "java": ">=25"
+  }
+}

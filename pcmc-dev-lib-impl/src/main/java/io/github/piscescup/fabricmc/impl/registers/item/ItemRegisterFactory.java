@@ -1,7 +1,7 @@
-package io.github.piscescup.fabricmc.impl.registers.items;
+package io.github.piscescup.fabricmc.impl.registers.item;
 
-import io.github.piscescup.fabricmc.api.registers.items.ItemPostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.items.ItemPreRegistrable;
+import io.github.piscescup.fabricmc.api.registers.item.ItemPostRegistrable;
+import io.github.piscescup.fabricmc.api.registers.item.ItemPreRegistrable;
 import io.github.piscescup.fabricmc.impl.registers.RegisterFactoryImpl;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.registries.Registries;
@@ -29,7 +29,7 @@ public class ItemRegisterFactory extends RegisterFactoryImpl<Item> {
 
     @Contract("_ -> new")
     @NotNull
-    public static ItemRegisterFactory of(@NotNull String namespace) {
+    public static ItemRegisterFactory ofNamespace(@NotNull String namespace) {
         return new ItemRegisterFactory(namespace);
     }
 

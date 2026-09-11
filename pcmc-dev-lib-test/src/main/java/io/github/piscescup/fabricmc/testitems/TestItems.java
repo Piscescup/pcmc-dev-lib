@@ -1,7 +1,7 @@
 package io.github.piscescup.fabricmc.testitems;
 
 import io.github.piscescup.fabricmc.constants.MCLanguage;
-import io.github.piscescup.fabricmc.impl.registers.items.ItemRegisterFactory;
+import io.github.piscescup.fabricmc.impl.registers.item.ItemRegisterFactory;
 import net.minecraft.world.item.Item;
 
 import static io.github.piscescup.fabricmc.Refs.MOD_ID;
@@ -13,7 +13,7 @@ import static io.github.piscescup.fabricmc.Refs.MOD_LOGGER;
  * @since 1.0.0
  */
 public class TestItems {
-    private static final ItemRegisterFactory ITEMS = ItemRegisterFactory.of(MOD_ID);
+    private static final ItemRegisterFactory ITEMS = ItemRegisterFactory.ofNamespace(MOD_ID);
 
     public static final Item ITEM1 = ITEMS.pathSimple("item1")
         .properties(new Item.Properties())

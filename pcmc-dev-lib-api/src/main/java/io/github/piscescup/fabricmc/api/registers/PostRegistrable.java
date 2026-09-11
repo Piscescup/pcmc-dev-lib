@@ -5,6 +5,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+
 /**
  *
  * @author REN YuanTong
@@ -23,4 +25,10 @@ public interface PostRegistrable<V, T extends V, POST extends PostRegistrable<V,
 
     @NotNull
     ResourceKey<V> resourceKey();
+
+    @SuppressWarnings("unchecked")
+    default POST collectsTo(@NotNull Collection<V> collection) {
+        collection.add(get());
+        return (POST) this;
+    }
 }

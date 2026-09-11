@@ -1,7 +1,7 @@
-package io.github.piscescup.fabricmc.impl.registers.items;
+package io.github.piscescup.fabricmc.impl.registers.item;
 
-import io.github.piscescup.fabricmc.api.registers.items.ItemPostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.items.ItemPreRegistrable;
+import io.github.piscescup.fabricmc.api.registers.item.ItemPostRegistrable;
+import io.github.piscescup.fabricmc.api.registers.item.ItemPreRegistrable;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.impl.registers.Register;
 import io.github.piscescup.util.validation.NullCheck;
@@ -32,7 +32,6 @@ public class ItemRegister<I extends Item>
         this.itemFactory = NullCheck.requireNonNull(factory, "factory");
     }
 
-
     @Override
     public ItemPreRegistrable<I> properties(@NotNull Item.Properties properties) {
         NullCheck.requireNonNull(properties, "properties");
@@ -58,7 +57,7 @@ public class ItemRegister<I extends Item>
             .setId(this.resourceKey));
 
         this.thingToBeRegistered = Registry.register(
-            BuiltInRegistries.ITEM,
+            this.registry,
             this.id,
             item
         );

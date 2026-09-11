@@ -3,10 +3,22 @@
   "id": "pcmc-dev-lib-api",
   "version": "${version}",
   "name": "PCMC Develop Lib API",
+  "description": "The APIs of the PCMC Develop Lib.",
+  "authors": [
+    "REN Yuantong"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/Piscescup/pcmc-dev-lib",
+    "issues": "https://github.com/Piscescup/pcmc-dev-lib/issues"
+  },
+  "license": "Apache-2.0",
+  "icon": "assets/pcmc-dev-lib-api/icon.png",
   "environment": "*",
   "depends": {
     "fabricloader": ">=0.19.5",
     "minecraft": "~26.2",
-    "java": ">=25"
+    "java": ">=25",
+    "fabric-api": "*"
   }
 }

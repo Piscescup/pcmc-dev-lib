@@ -3,6 +3,8 @@ package io.github.piscescup.fabricmc;
 import io.github.piscescup.fabricmc.testblocks.TestBlocks;
 import io.github.piscescup.fabricmc.testcreativetabs.TestCreativeModeTabs;
 import io.github.piscescup.fabricmc.testitems.TestItems;
+import io.github.piscescup.fabricmc.testtags.TestBlockTags;
+import io.github.piscescup.fabricmc.testtags.TestItemTagKeys;
 import net.fabricmc.api.ModInitializer;
 
 /**
@@ -16,5 +18,8 @@ public class TestMod implements ModInitializer {
         TestItems.registerModItems();
         TestBlocks.registerModBlocks();
         TestCreativeModeTabs.registerModCreativeTabs();
+
+        TestItemTagKeys.registerItemTags();
+        TestBlockTags.registerBlockTags();
     }
 }

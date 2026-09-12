@@ -33,7 +33,7 @@ public abstract class Register<
 
     protected Register(Registry<V> registry, Identifier id) {
         this.id = NullCheck.requireNonNull(id, "id");
-        this.registry = NullCheck.requireNonNull(registry, "registry");
+        this.registry = registry;
         this.resourceKey = ResourceKey.create(
             registry.key(),
             this.id

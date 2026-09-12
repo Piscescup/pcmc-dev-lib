@@ -4,7 +4,6 @@ import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.impl.registers.block.BlockRegistryFactory;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -20,17 +19,16 @@ import static io.github.piscescup.fabricmc.Refs.MOD_LOGGER;
 public class TestBlocks {
     public static final BlockRegistryFactory BLOCKS = BlockRegistryFactory.ofNamespace(MOD_ID);
 
-    public static final Block TEST_BLOCK1 = BLOCKS.path("test_item1")
+    public static final Block TEST_BLOCK1 = BLOCKS.path("test_block1")
         .blockProperties(BlockBehaviour.Properties.of()
             .sound(SoundType.ANVIL)
-            .strength(20.5F, 1.0F)
+            .strength(1.5F, 1.0F)
+            .requiresCorrectToolForDrops()
         )
         .blockItemProperties(new Item.Properties()
             .fireResistant()
         )
-        .blockItemFactory(
-            (b, p) -> new PotionItem(p)
-        )
+        .blockItemFactory(BlockItem::new)
         .register()
         .translate(MCLanguage.EN_US, "Test Block 1")
         .get();
@@ -40,7 +38,7 @@ public class TestBlocks {
             .sound(SoundType.ANVIL)
             .strength(1.5F, 1.0F)
             .replaceable()
-            // .requiresCorrectToolForDrops()
+            .requiresCorrectToolForDrops()
         )
         .blockItemProperties(new Item.Properties()
             .fireResistant()

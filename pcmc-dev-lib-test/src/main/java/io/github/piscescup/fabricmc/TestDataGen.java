@@ -5,6 +5,7 @@ import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.datagen.DatagenCollector;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.minecraft.core.registries.Registries;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,6 +19,8 @@ public class TestDataGen implements DataGeneratorEntrypoint {
     public void onInitializeDataGenerator(@NotNull FabricDataGenerator generator) {
         DatagenCollector.create()
             .langProvider(MCLanguage.EN_US)
+            .tagProvider(Registries.ITEM)
+            .tagProvider(Registries.BLOCK)
             .generate(generator);
     }
 }

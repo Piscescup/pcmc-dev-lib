@@ -1,5 +1,6 @@
 package io.github.piscescup.fabricmc.impl.store.tag;
 
+import io.github.piscescup.fabricmc.store.tag.TagKeyCollector;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
@@ -14,7 +15,7 @@ import java.util.Set;
  * @author REN YuanTong
  * @since 1.0.0
  */
-public class TagKeyCollector<T> {
+public class MutableTagKeyCollector<T> implements TagKeyCollector<T> {
     private final TagKey<T> tagKey;
 
     private final Set<ResourceKey<T>> resourceKeys =
@@ -26,7 +27,7 @@ public class TagKeyCollector<T> {
     private final Set<T> includeEntries =
         new LinkedHashSet<>();
 
-    TagKeyCollector(@NotNull TagKey<T> tagKey) {
+    MutableTagKeyCollector(@NotNull TagKey<T> tagKey) {
         this.tagKey = NullCheck.requireNonNull(tagKey, "tagKey");
     }
 
@@ -58,18 +59,22 @@ public class TagKeyCollector<T> {
         this.includedTags.add(includedTag);
     }
 
+    @Override
     public @NotNull TagKey<T> tagKey() {
         return this.tagKey;
     }
 
+    @Override
     public @NotNull Set<ResourceKey<T>> includeResourceKeys() {
         return Collections.unmodifiableSet(this.resourceKeys);
     }
 
+    @Override
     public @NotNull Set<TagKey<T>> includedTags() {
         return Collections.unmodifiableSet(this.includedTags);
     }
 
+    @Override
     public @NotNull Set<T> includeEntries() {
         return Collections.unmodifiableSet(this.includeEntries);
     }

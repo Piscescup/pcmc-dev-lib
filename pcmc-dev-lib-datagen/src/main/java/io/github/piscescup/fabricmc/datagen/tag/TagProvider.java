@@ -1,7 +1,8 @@
 package io.github.piscescup.fabricmc.datagen.tag;
 
-import io.github.piscescup.fabricmc.impl.store.tag.TagKeyCollector;
-import io.github.piscescup.fabricmc.impl.store.tag.TagKeysHolder;
+
+import io.github.piscescup.fabricmc.store.tag.ReadableTagKeysHolder;
+import io.github.piscescup.fabricmc.store.tag.TagKeyCollector;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.minecraft.core.Holder;
@@ -36,9 +37,14 @@ public class TagProvider<T> extends FabricTagsProvider<T> {
      * @param registryKey
      * @param registryLookupFuture the backing registry for the tag type
      */
-    public TagProvider(FabricPackOutput output, ResourceKey<? extends Registry<T>> resourceKey, CompletableFuture<HolderLookup.Provider> registryLookupFuture) {
+    public TagProvider(
+        FabricPackOutput output,
+        ResourceKey<? extends Registry<T>> resourceKey,
+        CompletableFuture<HolderLookup.Provider> registryLookupFuture,
+        ReadableTagKeysHolder tagKeysHolder
+    ) {
         super(output, resourceKey, registryLookupFuture);
-        this.collectors = TagKeysHolder.INSTANCE.getTagCollectors(resourceKey);
+        this.collectors = tagKeysHolder.getTagCollectors(resourceKey);
     }
 
 

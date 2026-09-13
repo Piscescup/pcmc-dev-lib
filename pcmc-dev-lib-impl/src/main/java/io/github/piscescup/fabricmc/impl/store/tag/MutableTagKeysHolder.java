@@ -1,5 +1,7 @@
 package io.github.piscescup.fabricmc.impl.store.tag;
 
+import io.github.piscescup.fabricmc.store.tag.ReadableTagKeysHolder;
+import io.github.piscescup.fabricmc.store.tag.TagKeyCollector;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
@@ -9,10 +11,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public enum TagKeysHolder {
+public enum MutableTagKeysHolder
+    implements ReadableTagKeysHolder
+{
     INSTANCE;
 
-    private final Map<ResourceKey<? extends Registry<?>>, Map<TagKey<?>, TagKeyCollector<?>>> registryMap =
+    private final Map<ResourceKey<? extends Registry<?>>, Map<TagKey<?>, MutableTagKeyCollector<?>>> registryMap =
         new LinkedHashMap<>();
 
     public synchronized <T> void addEntry(
@@ -89,70 +93,44 @@ public enum TagKeysHolder {
         getOrCreate(tagKey).addTag(includedTag);
     }
 
-    /**
-     * Creates an empty tag definition.
-     */
-    public synchronized <T> void registerTag(
-        @NotNull TagKey<T> tagKey
-    ) {
-        NullCheck.requireNonNull(tagKey, "tagKey");
-        getOrCreate(tagKey);
-    }
 
     @SuppressWarnings("unchecked")
-    public synchronized <T> @NotNull List<TagKeyCollector<T>> getTagCollectors(
+    @Override
+    public synchronized @NotNull <T> List<TagKeyCollector<T>> getTagCollectors(
         @NotNull ResourceKey<? extends Registry<T>> registryKey
     ) {
         NullCheck.requireNonNull(registryKey, "registryKey");
 
-        Map<TagKey<?>, TagKeyCollector<?>> collectors =
+        Map<TagKey<?>, MutableTagKeyCollector<?>> collectors =
             this.registryMap.get(registryKey);
 
         if (collectors == null) {
             return List.of();
         }
 
-        List<TagKeyCollector<T>> result =
+        List<MutableTagKeyCollector<T>> result =
             new ArrayList<>(collectors.size());
 
-        for (TagKeyCollector<?> collector : collectors.values()) {
-            result.add((TagKeyCollector<T>) collector);
+        for (MutableTagKeyCollector<?> collector : collectors.values()) {
+            result.add((MutableTagKeyCollector<T>) collector);
         }
 
         return List.copyOf(result);
     }
 
     @SuppressWarnings("unchecked")
-    public synchronized <T> Optional<TagKeyCollector<T>> get(
+    private <T> @NotNull MutableTagKeyCollector<T> getOrCreate(
         @NotNull TagKey<T> tagKey
     ) {
-        NullCheck.requireNonNull(tagKey, "tagKey");
-
-        Map<TagKey<?>, TagKeyCollector<?>> collectors =
-            this.registryMap.get(tagKey.registry());
-
-        if (collectors == null) {
-            return Optional.empty();
-        }
-
-        return Optional.ofNullable(
-            (TagKeyCollector<T>) collectors.get(tagKey)
-        );
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> @NotNull TagKeyCollector<T> getOrCreate(
-        @NotNull TagKey<T> tagKey
-    ) {
-        Map<TagKey<?>, TagKeyCollector<?>> collectors =
+        Map<TagKey<?>, MutableTagKeyCollector<?>> collectors =
             this.registryMap.computeIfAbsent(
                 tagKey.registry(),
                 _ -> new LinkedHashMap<>()
             );
 
-        return (TagKeyCollector<T>) collectors.computeIfAbsent(
+        return (MutableTagKeyCollector<T>) collectors.computeIfAbsent(
             tagKey,
-            _ -> new TagKeyCollector<>(tagKey)
+            _ -> new MutableTagKeyCollector<>(tagKey)
         );
     }
 

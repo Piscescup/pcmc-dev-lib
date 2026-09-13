@@ -4,7 +4,7 @@ import io.github.piscescup.fabricmc.api.registers.tag.TagKeyPostRegistrable;
 import io.github.piscescup.fabricmc.api.registers.tag.TagKeyPreRegistrable;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.impl.store.lang.MutableTranslationsHolder;
-import io.github.piscescup.fabricmc.impl.store.tag.TagKeysHolder;
+import io.github.piscescup.fabricmc.impl.store.tag.MutableTagKeysHolder;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
@@ -64,28 +64,28 @@ public class TagKeyRegister<T>
     @Override
     public TagKeyPreRegistrable<T> add(@NotNull Identifier id) {
         NullCheck.requireNonNull(id, "id");
-        TagKeysHolder.INSTANCE.addEntry(this.tagKey, id);
+        MutableTagKeysHolder.INSTANCE.addEntry(this.tagKey, id);
         return this;
     }
 
     @Override
     public TagKeyPreRegistrable<T> addEntry(@NotNull T entry) {
         NullCheck.requireNonNull(entry, "entry");
-        TagKeysHolder.INSTANCE.addEntry(this.tagKey, entry);
+        MutableTagKeysHolder.INSTANCE.addEntry(this.tagKey, entry);
         return this;
     }
 
     @Override
     public TagKeyPreRegistrable<T> addTag(@NotNull TagKey<T> tagKey) {
         NullCheck.requireNonNull(tagKey, "tagKey");
-        TagKeysHolder.INSTANCE.addTag(this.tagKey, tagKey);
+        MutableTagKeysHolder.INSTANCE.addTag(this.tagKey, tagKey);
         return this;
     }
 
     @Override
     public TagKeyPreRegistrable<T> addRegistryKey(@NotNull ResourceKey<T> key) {
         NullCheck.requireNonNull(key, "key");
-        TagKeysHolder.INSTANCE.addEntry(this.tagKey, key);
+        MutableTagKeysHolder.INSTANCE.addEntry(this.tagKey, key);
         return null;
     }
 

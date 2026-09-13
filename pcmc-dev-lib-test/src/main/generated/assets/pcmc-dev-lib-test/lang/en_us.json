@@ -1,0 +1,7 @@
+{
+  "block.pcmc-dev-lib-test.custom_block": "Custom Block",
+  "block.pcmc-dev-lib-test.test_block1": "Test Block 1",
+  "item.pcmc-dev-lib-test.custom_item": "Custom Item",
+  "item.pcmc-dev-lib-test.item1": "Item 1",
+  "itemGroup.pcmc-dev-lib-test.test_itemgroup": "Test ItemGroup 1"
+}

@@ -1,6 +1,6 @@
 package io.github.piscescup.fabricmc.datagen.lang;
 
-import io.github.piscescup.fabricmc.api.store.lang.LangTranslations;
+import io.github.piscescup.fabricmc.store.lang.LangTranslations;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.util.validation.NullCheck;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;

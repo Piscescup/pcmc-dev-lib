@@ -1,4 +1,4 @@
-package io.github.piscescup.fabricmc.api.store.lang;
+package io.github.piscescup.fabricmc.store.lang;
 
 import io.github.piscescup.fabricmc.constants.MCLanguage;
 import org.jetbrains.annotations.NotNull;

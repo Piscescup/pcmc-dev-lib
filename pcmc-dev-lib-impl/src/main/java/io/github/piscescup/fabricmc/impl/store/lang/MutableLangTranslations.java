@@ -1,6 +1,6 @@
 package io.github.piscescup.fabricmc.impl.store.lang;
 
-import io.github.piscescup.fabricmc.api.store.lang.LangTranslations;
+import io.github.piscescup.fabricmc.store.lang.LangTranslations;
 import io.github.piscescup.util.validation.NullCheck;
 import org.jetbrains.annotations.NotNull;
 

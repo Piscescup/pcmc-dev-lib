@@ -1,8 +1,8 @@
 package io.github.piscescup.fabricmc.datagen.lang;
 
+import io.github.piscescup.fabricmc.api.store.lang.LangTranslations;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
-import io.github.piscescup.fabricmc.impl.store.lang.MutableLangTranslations;
-import io.github.piscescup.fabricmc.impl.store.lang.MutableTranslationsHolder;
+import io.github.piscescup.util.validation.NullCheck;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.core.HolderLookup;
@@ -16,18 +16,29 @@ import java.util.concurrent.CompletableFuture;
  * @since 1.0.0
  */
 public class LanguageProvider extends FabricLanguageProvider {
-    private final MutableLangTranslations langTranslations;
+    private final LangTranslations translations;
 
     public LanguageProvider(
-        FabricPackOutput packOutput, CompletableFuture<HolderLookup.Provider> registryLookup,
-        MCLanguage language
+        FabricPackOutput packOutput,
+        CompletableFuture<HolderLookup.Provider> registryLookup,
+        MCLanguage language,
+        LangTranslations translations
     ) {
         super(packOutput, language.getCode(), registryLookup);
-        langTranslations = MutableTranslationsHolder.INSTANCE.translations(language);
+
+        this.translations = NullCheck.requireNonNull(
+            translations,
+            "translations"
+        );
     }
 
     @Override
-    public void generateTranslations(HolderLookup.@NotNull Provider registryLookup, @NotNull TranslationBuilder translationBuilder) {
-        langTranslations.translations().forEach(translationBuilder::add);
+    public void generateTranslations(
+        HolderLookup.@NotNull Provider registryLookup,
+        TranslationBuilder translationBuilder
+    ) {
+        this.translations
+            .translations()
+            .forEach(translationBuilder::add);
     }
 }

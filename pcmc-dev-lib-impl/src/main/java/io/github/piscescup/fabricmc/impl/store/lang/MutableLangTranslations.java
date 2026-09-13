@@ -15,19 +15,19 @@ import java.util.TreeMap;
  * @since 1.0.0
  */
 public class MutableLangTranslations
-    implements LangTranslations<MutableLangTranslations>
+    implements LangTranslations
 {
     private final NavigableMap<String, String> translations =
         new TreeMap<>();
 
     MutableLangTranslations() {}
+
     @Override
     public @NotNull Map<String, String> translations() {
         return Collections.unmodifiableMap(translations);
     }
 
-    @Override
-    public @NotNull MutableLangTranslations add(
+    public void add(
         @NotNull String key,
         @NotNull String translation
     ) {
@@ -49,8 +49,6 @@ public class MutableLangTranslations
                     .formatted(key, previous)
             );
         }
-
-        return this;
     }
 
 }

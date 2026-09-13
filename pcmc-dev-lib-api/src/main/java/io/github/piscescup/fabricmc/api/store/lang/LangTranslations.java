@@ -1,6 +1,5 @@
 package io.github.piscescup.fabricmc.api.store.lang;
 
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -13,7 +12,7 @@ import java.util.Map;
  * @author REN YuanTong
  * @since 1.0.0
  */
-public interface LangTranslations<SELF extends LangTranslations<SELF>> {
+public interface LangTranslations {
 
     /**
      * Returns an unmodifiable view of the translations.
@@ -23,21 +22,4 @@ public interface LangTranslations<SELF extends LangTranslations<SELF>> {
     @NotNull
     Map<String, String> translations();
 
-    /**
-     * Adds a translation.
-     *
-     * @param key         the translation key
-     * @param translation the translated text
-     *
-     * @return this translation container
-     *
-     * @throws IllegalStateException if the key already has a
-     *                               different translation
-     */
-    @Contract("_, _ -> this")
-    @NotNull
-    SELF add(
-        @NotNull String key,
-        @NotNull String translation
-    );
 }

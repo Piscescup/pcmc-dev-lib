@@ -31,9 +31,33 @@ public abstract class Register<
 
     protected T thingToBeRegistered;
 
-    protected Register(Registry<V> registry, Identifier id) {
+    protected MutableTranslationsHolder translationsHolder;
+
+
+
+    protected Register(
+        Registry<V> registry,
+        Identifier id
+    ) {
+        this(
+            registry,
+            id,
+            MutableTranslationsHolder.INSTANCE
+        );
+    }
+
+    protected Register(
+        Registry<V> registry,
+        Identifier id,
+        MutableTranslationsHolder translationsHolder
+    ) {
         this.id = NullCheck.requireNonNull(id, "id");
-        this.registry = registry;
+        this.registry = NullCheck.requireNonNull(registry, "registry");
+        this.translationsHolder = NullCheck.requireNonNull(
+            translationsHolder,
+            "translationsHolder"
+        );
+
         this.resourceKey = ResourceKey.create(
             registry.key(),
             this.id
@@ -48,7 +72,7 @@ public abstract class Register<
         NullCheck.requireNonNull(lang, "lang");
         NullCheck.requireNonNull(translation, "translation");
 
-        MutableTranslationsHolder.INSTANCE.add(lang, translateKey(), translation);
+        this.translationsHolder.add(lang, translateKey(), translation);
 
         return (POST) this;
     }

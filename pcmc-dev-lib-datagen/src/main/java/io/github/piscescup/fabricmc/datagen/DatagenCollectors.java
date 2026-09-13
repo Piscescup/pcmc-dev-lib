@@ -1,8 +1,7 @@
 package io.github.piscescup.fabricmc.datagen;
 
 import io.github.piscescup.exception.IllegalBuilderPatternConfigurationException;
-import io.github.piscescup.fabricmc.store.lang.ReadableTranslationsHolder;
-import io.github.piscescup.fabricmc.store.tag.ReadableTagKeysHolder;
+import io.github.piscescup.fabricmc.api.store.lang.ReadableTranslationsHolder;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.datagen.lang.LanguageProvider;
 import io.github.piscescup.fabricmc.datagen.tag.TagProvider;
@@ -25,11 +24,8 @@ import java.util.List;
 public final class DatagenCollectors {
     private ReadableTranslationsHolder translationsHolder;
 
-    private ReadableTagKeysHolder tagKeysHolder;
-
 
     private final List<FabricDataGenerator.Pack.RegistryDependentFactory<? extends DataProvider>> registryDependentFactories = new ArrayList<>();
-
     private final List<DataProvider.Factory<? extends DataProvider>> factories = new ArrayList<>();
 
 
@@ -53,7 +49,7 @@ public final class DatagenCollectors {
 
         registryDependentFactories.add(
             (packOutput, lookupProvider) ->
-                new TagProvider<>(packOutput, registry, lookupProvider, this.tagKeysHolder)
+                new TagProvider<>(packOutput, registry, lookupProvider)
         );
 
         return this;
@@ -78,18 +74,14 @@ public final class DatagenCollectors {
     {
         private DatagenCollectors collectors;
 
+        private ReadableTranslationsHolder translationsHolder;
 
         DataProviderConfiguration() {
             this.collectors = new DatagenCollectors();
         }
 
         public DataProviderConfiguration translationHolder(ReadableTranslationsHolder translationsHolder) {
-            this.collectors.translationsHolder = translationsHolder;
-            return this;
-        }
-
-        public DataProviderConfiguration tagKeyHolder(ReadableTagKeysHolder tagKeysHolder) {
-            this.collectors.tagKeysHolder = tagKeysHolder;
+            this.translationsHolder = translationsHolder;
             return this;
         }
 
@@ -100,10 +92,7 @@ public final class DatagenCollectors {
                     "translationsHolder"
                 );
 
-            if (this.collectors.tagKeysHolder == null)
-                throw IllegalBuilderPatternConfigurationException.missing(
-                    "registryDependentFactories"
-                );
+            this.collectors.translationsHolder = translationsHolder;
 
             return this.collectors;
         }

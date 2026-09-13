@@ -5,9 +5,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 /**
- * Stores translations for a specific language.
+ * Provides a read-only {@link Map} of translations for one Minecraft language.
  *
- * @param <SELF> the concrete translation container type
+ * <p>Each entry maps a translation key, such as an item or creative-tab key,
+ * to the localized text intended for that language.</p>
  *
  * @author REN YuanTong
  * @since 1.0.0
@@ -17,7 +18,7 @@ public interface LangTranslations {
     /**
      * Returns an unmodifiable view of the translations.
      *
-     * @return the translations indexed by translation key
+     * @return translation keys mapped to localized text
      */
     @NotNull
     Map<String, String> translations();

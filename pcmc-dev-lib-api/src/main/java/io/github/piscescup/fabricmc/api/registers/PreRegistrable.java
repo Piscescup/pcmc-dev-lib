@@ -3,14 +3,16 @@ package io.github.piscescup.fabricmc.api.registers;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents the configuration stage before an object is registered.
+ * Represents the configuration stage of a registration operation.
  *
- * <p>Calling {@link #register()} completes the registration and returns
- * the corresponding post-registration stage.</p>
+ * <p>This stage exposes the options that must be selected before an object is
+ * registered. Calling {@link #register()} completes the operation and returns
+ * the matching {@link PostRegistrable post-registration stage}.</p>
  *
- * @param <T>    the type of object being registered
- * @param <PRE>  the concrete pre-registration stage type
- * @param <POST> the corresponding post-registration stage type
+ * @param <V> the base type accepted by the target registry
+ * @param <T> the concrete type being registered
+ * @param <PRE> the concrete pre-registration stage type
+ * @param <POST> the matching post-registration stage type
  *
  * @author REN YuanTong
  * @since 1.0.0
@@ -22,10 +24,10 @@ public interface PreRegistrable<
 {
 
     /**
-     * Registers the configured object and enters the
-     * post-registration stage.
+     * Registers the configured object and enters the matching
+     * {@link PostRegistrable post-registration stage}.
      *
-     * @return the corresponding post-registration stage
+     * @return the matching post-registration stage
      */
     @NotNull
     POST register();

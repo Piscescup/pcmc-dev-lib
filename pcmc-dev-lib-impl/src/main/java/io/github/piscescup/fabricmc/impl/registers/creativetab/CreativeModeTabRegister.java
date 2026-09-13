@@ -2,7 +2,6 @@ package io.github.piscescup.fabricmc.impl.registers.creativetab;
 
 import io.github.piscescup.fabricmc.api.registers.creativetab.CreativeModeTabPostRegistrable;
 import io.github.piscescup.fabricmc.api.registers.creativetab.CreativeModeTabPreRegistrable;
-import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.impl.registers.Register;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.Registry;
@@ -37,11 +36,6 @@ public final class CreativeModeTabRegister
 
     CreativeModeTabRegister(Identifier id) {
         super(BuiltInRegistries.CREATIVE_MODE_TAB, id);
-    }
-
-    @Override
-    public @NotNull CreativeModeTabPostRegistrable translate(@NotNull MCLanguage lang, @NotNull String translation) {
-        return this;
     }
 
     @Override
@@ -132,7 +126,7 @@ public final class CreativeModeTabRegister
     }
 
     @NotNull
-    String translateKey() {
+    protected String translateKey() {
         return "itemGroup.%s.%s".formatted(id.getNamespace(), id.getPath());
     }
 }

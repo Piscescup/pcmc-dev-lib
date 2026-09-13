@@ -1,0 +1,10 @@
+{
+  "values": [
+    "minecraft:paper",
+    "minecraft:gold_ingot",
+    "minecraft:iron_ingot",
+    "minecraft:diamond",
+    "pcmc-dev-lib-test:custom_item",
+    "pcmc-dev-lib-test:item1"
+  ]
+}

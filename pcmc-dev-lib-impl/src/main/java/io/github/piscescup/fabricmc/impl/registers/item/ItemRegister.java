@@ -2,7 +2,6 @@ package io.github.piscescup.fabricmc.impl.registers.item;
 
 import io.github.piscescup.fabricmc.api.registers.item.ItemPostRegistrable;
 import io.github.piscescup.fabricmc.api.registers.item.ItemPreRegistrable;
-import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.impl.registers.Register;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.Registry;
@@ -41,8 +40,8 @@ public class ItemRegister<I extends Item>
     }
 
     @Override
-    public @NonNull ItemRegister<I> translate(@NotNull MCLanguage lang, @NotNull String translation) {
-        return this;
+    protected String translateKey() {
+        return thingToBeRegistered.getDescriptionId();
     }
 
     /**
@@ -64,5 +63,6 @@ public class ItemRegister<I extends Item>
 
         return this;
     }
+
 
 }

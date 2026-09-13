@@ -5,8 +5,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This enum class defines all languages that are supported in <b>Minecraft</b>.
+ * Enumerates the Minecraft language codes supported by the library's
+ * translation APIs.
  *
+ * <p>Each constant represents the code used by a Minecraft language resource.
+ * Pass a constant to a post-registration stage when declaring localized names:</p>
+ * <pre>{@code
+ * public static final Item CUSTOM_ITEM = ITEMS.path("custom_item", CustomItem::new)
+ *     .register()
+ *     .translate(MCLanguage.EN_US, "Custom Item")
+ *     .get();
+ * }</pre>
  *
  * @author REN YuanTong
  * @since 1.0.0
@@ -687,6 +696,11 @@ public enum MCLanguage {
 
     private final String code;
 
+    /**
+     * Contains all supported language constants in declaration order.
+     *
+     * <p>Callers should treat this array as read-only.</p>
+     */
     public static final MCLanguage[] LANGUAGES = MCLanguage.values();
 
     static {
@@ -699,10 +713,23 @@ public enum MCLanguage {
         this.code = code;
     }
 
+    /**
+     * Returns the lowercase language code used by Minecraft resources.
+     *
+     * @return the language code, such as {@code en_us} or {@code zh_cn}
+     */
     public String getCode() {
         return code;
     }
 
+    /**
+     * Finds a supported language by its Minecraft language code.
+     *
+     * <p>Unknown and {@code null} codes fall back to {@link #EN_US}.</p>
+     *
+     * @param code the lowercase Minecraft language code
+     * @return the matching language, or {@link #EN_US} when no match exists
+     */
     public static MCLanguage fromLangCode(String code) {
         return CACHE.getOrDefault(code, EN_US);
     }

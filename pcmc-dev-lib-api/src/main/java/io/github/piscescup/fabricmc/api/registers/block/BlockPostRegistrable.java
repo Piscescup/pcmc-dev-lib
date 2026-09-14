@@ -9,13 +9,31 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Provides post-registration operations for a {@link Block} and its block {@link Item}.
  *
- * <p>The standard post-registration methods refer to the block itself. This
- * stage additionally exposes the block item's identifier and registered value.</p>
+ * <p>This stage is returned by {@link BlockPreRegistrable#register()} after both
+ * the block and its item have been registered. The inherited accessors and
+ * collection operation refer to the block. The additional accessors expose
+ * the corresponding item's identifier and registered instance.</p>
  *
- * @param <B> the concrete registered block type
+ * <p>Typical usage:</p>
+ * <pre>{@code
+ * BlockPostRegistrable<Block> registered = BLOCKS.path("test_block1")
+ *     .register()
+ *     .translate(MCLanguage.EN_US, "Test Block 1");
+ * Block block = registered.get();
+ * Item blockItem = registered.blockItem();
+ * Identifier blockItemId = registered.blockItemId();
+ * }</pre>
+ *
+ * <p>The supplied implementation records translations under the block's
+ * description ID. The default block item uses the block description prefix,
+ * allowing it to share that translated name.</p>
+ *
+ * @param <B> the concrete registered block type; must be a subtype of {@link Block}
  *
  * @author REN YuanTong
  * @since 1.0.0
+ * @see BlockPreRegistrable
+ * @see PostRegistrable
  */
 public interface BlockPostRegistrable<B extends Block>
     extends PostRegistrable<Block, B, BlockPostRegistrable<B>>
@@ -23,7 +41,11 @@ public interface BlockPostRegistrable<B extends Block>
     /**
      * Returns the namespaced {@link Identifier} of the matching block item.
      *
+     * <p>The item belongs to the item registry and may have an identifier
+     * different from {@link #blockId()}, as selected by the registration factory.</p>
+     *
      * @return the block-item identifier
+     * @see #blockItem()
      */
     @NotNull
     Identifier blockItemId();
@@ -31,7 +53,10 @@ public interface BlockPostRegistrable<B extends Block>
     /**
      * Returns the namespaced {@link Identifier} of the block.
      *
+     * <p>This is a convenience alias for the inherited {@link #identifier()}.</p>
+     *
      * @return the block identifier
+     * @see #identifier()
      */
     @NotNull
     default Identifier blockId() {
@@ -41,7 +66,13 @@ public interface BlockPostRegistrable<B extends Block>
     /**
      * Returns the {@link Item} registered for this block.
      *
+     * <p>This is the existing result of the selected block-item factory. A
+     * custom factory may produce an item other than the standard
+     * {@link net.minecraft.world.item.BlockItem BlockItem}, so callers should
+     * not assume a more specific return type.</p>
+     *
      * @return the registered block item
+     * @see #blockItemId()
      */
     @NotNull
     Item blockItem();

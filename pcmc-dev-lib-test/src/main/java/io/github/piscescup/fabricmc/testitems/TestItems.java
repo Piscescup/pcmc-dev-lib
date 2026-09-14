@@ -15,7 +15,7 @@ import static io.github.piscescup.fabricmc.Refs.MOD_LOGGER;
 public class TestItems {
     private static final ItemRegisterFactory ITEMS = ItemRegisterFactory.ofNamespace(MOD_ID);
 
-    public static final Item ITEM1 = ITEMS.pathSimple("item1")
+    public static final Item ITEM1 = ITEMS.path("item1")
         .properties(new Item.Properties())
         .register()
         .translate(MCLanguage.EN_US, "Item 1")

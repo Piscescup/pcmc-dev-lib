@@ -14,6 +14,9 @@
 	"entrypoints": {
 		"main": [
 			"io.github.piscescup.fabricmc.TestMod"
+		],
+		"fabric-datagen": [
+			"io.github.piscescup.fabricmc.TestDataGen"
 		]
 	},
 	"license": "CC0-1.0",

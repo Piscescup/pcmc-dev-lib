@@ -1,11 +1,13 @@
 package io.github.piscescup.fabricmc.datagen;
 
 import io.github.piscescup.exception.IllegalBuilderPatternConfigurationException;
-import io.github.piscescup.fabricmc.store.lang.ReadableTranslationsHolder;
-import io.github.piscescup.fabricmc.store.tag.ReadableTagKeysHolder;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.datagen.lang.LanguageProvider;
+import io.github.piscescup.fabricmc.datagen.recipe.RecipesGenerator;
 import io.github.piscescup.fabricmc.datagen.tag.TagProvider;
+import io.github.piscescup.fabricmc.store.lang.ReadableTranslationsHolder;
+import io.github.piscescup.fabricmc.store.recipe.ReadableRecipeRegistrablesHolder;
+import io.github.piscescup.fabricmc.store.tag.ReadableTagKeysHolder;
 import io.github.piscescup.interfaces.Builder;
 import io.github.piscescup.util.validation.NullCheck;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -65,6 +67,8 @@ public final class DatagenCollectors {
      */
     private ReadableTagKeysHolder tagKeysHolder;
 
+
+    private ReadableRecipeRegistrablesHolder recipesHolder;
 
     /**
      * Ordered {@link FabricDataGenerator.Pack.RegistryDependentFactory} queue.
@@ -141,6 +145,15 @@ public final class DatagenCollectors {
         registryDependentFactories.add(
             (packOutput, lookupProvider) ->
                 new TagProvider<>(packOutput, registry, lookupProvider, this.tagKeysHolder)
+        );
+
+        return this;
+    }
+
+    public DatagenCollectors recipesProvider() {
+        registryDependentFactories.add(
+            (packOutput, lookupProvider) ->
+                new RecipesGenerator(packOutput, lookupProvider, this.recipesHolder)
         );
 
         return this;
@@ -227,6 +240,11 @@ public final class DatagenCollectors {
             return this;
         }
 
+        public DataProviderConfiguration recipeHolder(ReadableRecipeRegistrablesHolder recipesHolder) {
+            this.collectors.recipesHolder = recipesHolder;
+            return this;
+        }
+
         /**
          * Validates both holder selections and returns the configured collector.
          *
@@ -246,6 +264,11 @@ public final class DatagenCollectors {
             if (this.collectors.tagKeysHolder == null)
                 throw IllegalBuilderPatternConfigurationException.missing(
                     "registryDependentFactories"
+                );
+
+            if (this.collectors.recipesHolder == null)
+                throw IllegalBuilderPatternConfigurationException.missing(
+                    "recipeHolder"
                 );
 
             return this.collectors;

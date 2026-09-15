@@ -2,9 +2,15 @@ package io.github.piscescup.fabricmc.impl.registers.recipe.crafting;
 
 import io.github.piscescup.fabricmc.api.registers.recipe.crafting.ShapedCraftingRecipeRegistrable;
 import io.github.piscescup.fabricmc.impl.registers.recipe.RecipeRegister;
+import io.github.piscescup.fabricmc.impl.store.recipe.ItemCriterionHolderImpl;
+import io.github.piscescup.fabricmc.impl.store.recipe.TagCriterionHolderImpl;
+import io.github.piscescup.fabricmc.store.recipe.ItemCriterionHolder;
 import io.github.piscescup.fabricmc.store.recipe.RecipeGenerationContext;
+import io.github.piscescup.fabricmc.store.recipe.TagCriterionHolder;
 import io.github.piscescup.util.validation.NullCheck;
-import net.minecraft.advancements.triggers.Criterion;
+import net.minecraft.advancements.predicates.ItemPredicate;
+import net.minecraft.advancements.predicates.MinMaxBounds;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
@@ -17,37 +23,70 @@ import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static net.minecraft.data.recipes.RecipeProvider.inventoryTrigger;
 
 /**
+ * Mutable implementation of one shaped crafting-recipe definition.
+ *
+ * <p>The definition retains pattern rows, symbol mappings, unlock criteria,
+ * recipe-book options, and result information. During data generation,
+ * {@link #save(RecipeGenerationContext, ResourceKey)} transfers that state to a
+ * {@link ShapedRecipeBuilder} in deterministic insertion order.</p>
+ *
+ * <p>Instances are created by {@link CraftingRecipeRegisterFactory}. Complete
+ * their mutable configuration before registering or collecting them, and avoid
+ * mutating a definition while a data-provider run is saving it.</p>
  *
  * @author REN YuanTong
  * @since 1.0.0
+ * @see ShapedCraftingRecipeRegistrable
  */
 public class ShapedCraftingRecipeRegister
     extends RecipeRegister<ShapedCraftingRecipeRegistrable>
     implements ShapedCraftingRecipeRegistrable
 {
+    /** The default recipe resource key. */
     private final ResourceKey<Recipe<?>> id;
+    /** The recipe-book category forwarded to the Minecraft builder. */
     private final RecipeCategory category;
+    /** The item-like result forwarded to the Minecraft builder. */
     private final ItemLike result;
+    /** The positive number of result items produced. */
     private final int resultCount;
 
+    /** Pattern rows in the order supplied by {@link #pattern(String)}. */
     private final List<String> patterns =
         new ArrayList<>();
 
+    /** Symbol definitions in first-definition order. */
     private final Map<Character, IngredientDefinition> ingredients =
         new LinkedHashMap<>();
 
-    private final Map<String, Criterion<?>> criteria =
-        new LinkedHashMap<>();
+    /** Item-based inventory criteria retained for generation. */
+    private final Collection<ItemCriterionHolder> itemCriterionHolders =
+        new ArrayList<>();
 
+    /** Tag-based inventory criteria retained for generation. */
+    private final Collection<TagCriterionHolder> tagCriterionHolders =
+        new ArrayList<>();
+
+    /** The recipe-book group, or {@code null} when no group is configured. */
     private String group;
+    /** Whether Minecraft should show an unlock notification. */
     private boolean showNotification = true;
 
+    /**
+     * Creates an empty shaped-recipe definition.
+     *
+     * @param id          the default recipe resource key
+     * @param category    the recipe-book category
+     * @param result      the item or block produced by the recipe
+     * @param resultCount the positive number of result items produced
+     * @throws NullPointerException if {@code id}, {@code category}, or {@code result} is {@code null}
+     * @throws IllegalArgumentException if {@code resultCount} is not positive
+     */
     ShapedCraftingRecipeRegister(
         ResourceKey<Recipe<?>> id,
         RecipeCategory category,
@@ -67,6 +106,12 @@ public class ShapedCraftingRecipeRegister
         this.resultCount = resultCount;
     }
 
+    /**
+     * Sets the unlock-notification option forwarded to the shaped recipe builder.
+     *
+     * @param showNotification {@code true} to show an unlock notification
+     * @return this recipe definition
+     */
     @Override
     public ShapedCraftingRecipeRegistrable showNotification(
         boolean showNotification
@@ -75,6 +120,15 @@ public class ShapedCraftingRecipeRegister
         return this;
     }
 
+    /**
+     * Defines a symbol as any item belonging to a tag.
+     *
+     * @param symbol the non-space symbol to define
+     * @param tag    the item tag accepted for the symbol
+     * @return this recipe definition
+     * @throws NullPointerException if {@code symbol} or {@code tag} is {@code null}
+     * @throws IllegalArgumentException if the symbol is a space or is already defined
+     */
     @Override
     public ShapedCraftingRecipeRegistrable define(
         Character symbol,
@@ -91,6 +145,15 @@ public class ShapedCraftingRecipeRegister
         return this;
     }
 
+    /**
+     * Defines a symbol using an arbitrary ingredient.
+     *
+     * @param symbol     the non-space symbol to define
+     * @param ingredient the ingredient accepted for the symbol
+     * @return this recipe definition
+     * @throws NullPointerException if {@code symbol} or {@code ingredient} is {@code null}
+     * @throws IllegalArgumentException if the symbol is a space or is already defined
+     */
     @Override
     public ShapedCraftingRecipeRegistrable define(
         Character symbol,
@@ -110,6 +173,13 @@ public class ShapedCraftingRecipeRegister
         return this;
     }
 
+    /**
+     * Appends a pattern row for later application to the Minecraft builder.
+     *
+     * @param row the non-null pattern row
+     * @return this recipe definition
+     * @throws NullPointerException if {@code row} is {@code null}
+     */
     @Override
     public ShapedCraftingRecipeRegistrable pattern(
         String row
@@ -118,23 +188,44 @@ public class ShapedCraftingRecipeRegister
         return this;
     }
 
+    /**
+     * Retains an item-based inventory criterion.
+     *
+     * @param name  the generated criterion name
+     * @param item  the required item-like value
+     * @param count the exact required count
+     * @return this recipe definition
+     */
     @Override
-    public ShapedCraftingRecipeRegistrable unlockedBy(
-        @NotNull String name,
-        @NotNull Criterion<?> criterion
-    ) {
-        Criterion<?> previous =
-            criteria.putIfAbsent(name, criterion);
-
-        if (previous != null) {
-            throw new IllegalArgumentException(
-                "Duplicate recipe criterion: " + name
-            );
-        }
-
+    public ShapedCraftingRecipeRegistrable unlockedBy(String name, ItemLike item, int count) {
+        this.itemCriterionHolders.add(
+            new ItemCriterionHolderImpl(name, item.asItem(), count)
+        );
         return this;
     }
 
+    /**
+     * Retains a tag-based inventory criterion.
+     *
+     * @param name  the generated criterion name
+     * @param tag   the required item tag
+     * @param count the requested number of matching items
+     * @return this recipe definition
+     */
+    @Override
+    public ShapedCraftingRecipeRegistrable unlockedBy(String name, TagKey<Item> tag, int count) {
+        this.tagCriterionHolders.add(
+            new TagCriterionHolderImpl(name, tag, count)
+        );
+        return this;
+    }
+
+    /**
+     * Replaces the recipe-book group forwarded during generation.
+     *
+     * @param group the group name, or {@code null} for no group
+     * @return this recipe definition
+     */
     @Override
     public ShapedCraftingRecipeRegistrable group(
         @Nullable String group
@@ -143,19 +234,35 @@ public class ShapedCraftingRecipeRegister
         return this;
     }
 
+    /**
+     * Returns the resource key created by the recipe factory.
+     *
+     * @return the default recipe resource key
+     */
     @Override
     public ResourceKey<Recipe<?>> defaultId() {
         return id;
     }
 
+    /**
+     * Builds and submits the shaped recipe under an explicit resource key.
+     *
+     * <p>Pattern rows and symbol definitions are applied first, followed by
+     * arbitrary criteria and inventory-derived criteria. The group and
+     * notification option are applied immediately before the builder is saved.</p>
+     *
+     * @param context  the active recipe-generation context
+     * @param location the resource key under which the recipe is saved
+     */
     @Override
     public void save(
         @NotNull RecipeGenerationContext context,
         @NotNull ResourceKey<Recipe<?>> location
     ) {
+        HolderGetter<Item> itemHolderGetter = context.holderGetter(Registries.ITEM);
         ShapedRecipeBuilder builder =
             ShapedRecipeBuilder.shaped(
-                context.holderGetter(Registries.ITEM),
+                itemHolderGetter,
                 category,
                 result,
                 resultCount
@@ -172,12 +279,36 @@ public class ShapedCraftingRecipeRegister
 
         criteria.forEach(builder::unlockedBy);
 
+        this.itemCriterionHolders.forEach(
+            holder -> builder.unlockedBy(
+                holder.criterionName(),
+                inventoryTrigger(ItemPredicate.Builder.item()
+                                     .of(itemHolderGetter, holder.criterionItem())
+                                     .withCount(MinMaxBounds.Ints.exactly(holder.criterionCount()))
+                )
+            )
+        );
+
+        this.tagCriterionHolders.forEach(
+            holder -> builder.unlockedBy(
+                holder.criterionName(),
+                inventoryTrigger(ItemPredicate.Builder.item().of(itemHolderGetter, holder.criterionTag()))
+            )
+        );
+
         builder
             .group(group)
             .showNotification(showNotification)
             .save(context.output(), location);
     }
 
+    /**
+     * Adds one validated symbol definition to the insertion-ordered map.
+     *
+     * @param symbol     the non-space pattern symbol
+     * @param definition the deferred builder operation for the symbol
+     * @throws IllegalArgumentException if {@code symbol} is a space or is already defined
+     */
     private void addIngredient(
         char symbol,
         IngredientDefinition definition
@@ -202,6 +333,12 @@ public class ShapedCraftingRecipeRegister
     @FunctionalInterface
     private interface IngredientDefinition {
 
+        /**
+         * Applies this deferred symbol definition to a shaped recipe builder.
+         *
+         * @param builder the builder receiving the definition
+         * @param symbol  the symbol associated with this definition
+         */
         void apply(
             ShapedRecipeBuilder builder,
             char symbol

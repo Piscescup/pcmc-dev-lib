@@ -20,6 +20,8 @@ public class TestDataGen implements DataGeneratorEntrypoint {
 
     @Override
     public void onInitializeDataGenerator(@NotNull FabricDataGenerator generator) {
+        FabricDataGenerator.Pack pack = generator.createPack();
+
         DatagenCollectors.configuration()
             .translationHolder(MutableTranslationsHolder.INSTANCE)
             .tagKeyHolder(MutableTagKeysHolder.INSTANCE)
@@ -29,6 +31,6 @@ public class TestDataGen implements DataGeneratorEntrypoint {
             .tagProvider(Registries.ITEM)
             .tagProvider(Registries.BLOCK)
             .recipesProvider()
-            .generate(generator);
+            .generate(pack);
     }
 }

@@ -18,7 +18,7 @@ import static io.github.piscescup.fabricmc.Refs.MOD_ID;
  * @author REN YuanTong
  * @since
  */
-public final class TestShapedcraftingRecipes {
+public final class TestCraftingRecipes {
     private static final Collection<RecipeRegistrable<?>> RECIPES =
         new ArrayList<>();
 
@@ -29,7 +29,7 @@ public final class TestShapedcraftingRecipes {
         .shapeless("test_item1", RecipeCategory.MISC, TestItems.ITEM1)
         .requires(Items.DIAMOND)
         .requires(ItemTags.WOOL)
-        .unlockedBy("test_item1", )
+        .unlockedBy("test_item1", Items.DIAMOND)
         .collectsTo(RECIPES);
 
     public static void registerRecipes() {

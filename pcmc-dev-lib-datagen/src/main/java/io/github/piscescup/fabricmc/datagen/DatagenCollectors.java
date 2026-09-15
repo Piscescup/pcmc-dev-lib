@@ -21,36 +21,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Configures {@link LanguageProvider} and {@link TagProvider} instances for a Fabric data pack.
+ * Configures language, tag, and recipe data providers for a Fabric data pack.
  *
- * <p>Start with {@link #configuration()}, supply the readable translation and
- * tag holders, and call {@link DataProviderConfiguration#build()}. Then select
- * languages and registries before attaching the providers to a
- * {@link FabricDataGenerator} through {@link #generate(FabricDataGenerator)}.</p>
+ * <p>Start with {@link #configuration()}, supply the readable translation,
+ * tag, and recipe holders, and call {@link DataProviderConfiguration#build()}.
+ * Then select languages, registries, and recipe generation before attaching
+ * the providers to a {@link FabricDataGenerator} through
+ * {@link #generate(FabricDataGenerator.Pack)}.</p>
  *
  * <p>Typical usage in a data-generator entrypoint:</p>
  * <pre>{@code
+ * FabricDataGenerator.Pack pack = generator.createPack();
+ *
  * DatagenCollectors.configuration()
  *     .translationHolder(MutableTranslationsHolder.INSTANCE)
  *     .tagKeyHolder(MutableTagKeysHolder.INSTANCE)
+ *     .recipeHolder(MutableReciperegistrablesHolder.INSTANCE)
  *     .build()
  *     .langProvider(MCLanguage.EN_US)
  *     .tagProvider(Registries.ITEM)
  *     .tagProvider(Registries.BLOCK)
- *     .generate(generator);
+ *     .recipesProvider()
+ *     .generate(pack);
  * }</pre>
  *
  * <p>Provider-selection methods queue factories. The holders are consulted when
  * those factories create providers, and Fabric runs the providers as part of
- * its data-generation lifecycle. Finish declaring translations and tag members
- * before attaching providers, especially because a tag provider retains the
- * collector list obtained at construction.</p>
+ * its data-generation lifecycle. Finish declaring translations, tag members,
+ * and recipe definitions before generation starts. A tag provider retains the
+ * collector list obtained at construction, while the supplied recipe holder
+ * exposes a live collection to its provider.</p>
  *
  * @author REN YuanTong
  * @since 1.0.0
  * @see DataProviderConfiguration
  * @see LanguageProvider
  * @see TagProvider
+ * @see RecipesGenerator
  */
 public final class DatagenCollectors {
     /**
@@ -68,12 +75,18 @@ public final class DatagenCollectors {
     private ReadableTagKeysHolder tagKeysHolder;
 
 
+    /**
+     * The {@link ReadableRecipeRegistrablesHolder} selected by the configuration builder.
+     * Initially {@code null}; queued {@link RecipesGenerator} factories consult
+     * this reference when they are invoked.
+     */
     private ReadableRecipeRegistrablesHolder recipesHolder;
 
     /**
      * Ordered {@link FabricDataGenerator.Pack.RegistryDependentFactory} queue.
-     * Initially empty; {@link #langProvider(MCLanguage)} and
-     * {@link #tagProvider(ResourceKey)} append factories for {@link #generate(FabricDataGenerator)}.
+     * Initially empty; {@link #langProvider(MCLanguage)},
+     * {@link #tagProvider(ResourceKey)}, and {@link #recipesProvider()} append
+     * factories for {@link #generate(FabricDataGenerator.Pack)}.
      */
     private final List<FabricDataGenerator.Pack.RegistryDependentFactory<? extends DataProvider>> registryDependentFactories = new ArrayList<>();
 
@@ -86,9 +99,9 @@ public final class DatagenCollectors {
     /**
      * Creates an unconfigured collector with empty provider queues.
      *
-     * <p>Both holder references are initially {@code null}. Use
+     * <p>All three holder references are initially {@code null}. Use
      * {@link #configuration()} to select and validate the holders before
-     * attaching language or tag providers to a {@link FabricDataGenerator}.</p>
+     * attaching language, tag, or recipe providers to a {@link FabricDataGenerator}.</p>
      *
      * @see #configuration()
      */
@@ -98,7 +111,7 @@ public final class DatagenCollectors {
     /**
      * Starts a new configuration with independent provider queues.
      *
-     * @return a new {@link DataProviderConfiguration} for selecting the translation and tag holders
+     * @return a new configuration for selecting the translation, tag, and recipe holders
      */
     @Contract(" -> new")
     @NotNull
@@ -116,7 +129,7 @@ public final class DatagenCollectors {
      * @param language the {@link MCLanguage} whose translations should be generated; must not be {@code null}
      * @return this collector for further provider selection
      * @throws NullPointerException if {@code language} is {@code null}
-     * @see #generate(FabricDataGenerator)
+     * @see #generate(FabricDataGenerator.Pack)
      */
     public DatagenCollectors langProvider(MCLanguage language) {
         NullCheck.requireNonNull(language, "language");
@@ -137,7 +150,7 @@ public final class DatagenCollectors {
      * @param <T>      the {@link Registry} value type
      * @return this collector for further provider selection
      * @throws NullPointerException if {@code registry} is {@code null}
-     * @see #generate(FabricDataGenerator)
+     * @see #generate(FabricDataGenerator.Pack)
      */
     public <T> DatagenCollectors tagProvider(ResourceKey<? extends Registry<T>> registry) {
         NullCheck.requireNonNull(registry, "registry");
@@ -150,6 +163,16 @@ public final class DatagenCollectors {
         return this;
     }
 
+    /**
+     * Queues a {@link RecipesGenerator} for the configured recipe holder.
+     *
+     * <p>Repeated calls enqueue additional providers. The holder is consulted
+     * when Fabric invokes the queued factory, and its returned recipe collection
+     * is retained by the resulting provider.</p>
+     *
+     * @return this collector for further provider selection
+     * @see #generate(FabricDataGenerator.Pack)
+     */
     public DatagenCollectors recipesProvider() {
         registryDependentFactories.add(
             (packOutput, lookupProvider) ->
@@ -161,19 +184,18 @@ public final class DatagenCollectors {
 
 
     /**
-     * Creates a {@link FabricDataGenerator.Pack} and attaches the queued provider factories.
+     * Attaches the queued provider factories to a {@link FabricDataGenerator.Pack}.
      *
      * <p>Registry-dependent factories are attached first, followed by ordinary
      * factories, preserving order within each queue. This method registers the
      * providers with Fabric; file generation is performed by the data generator.
      * The queues are retained, so another call attempts to attach them to another pack.</p>
      *
-     * @param generator the {@link FabricDataGenerator} receiving the configured pack; must not be {@code null}
-     * @throws NullPointerException if {@code generator} is {@code null}, or a
+     * @param pack the data-generator pack receiving the queued providers; must not be {@code null}
+     * @throws NullPointerException if {@code pack} is {@code null}, or a
      *         queued provider factory is invoked while its required holder is {@code null}
      */
-    public void generate(@NotNull FabricDataGenerator generator) {
-        FabricDataGenerator.Pack pack = generator.createPack();
+    public void generate(@NotNull FabricDataGenerator.Pack pack) {
 
         registryDependentFactories.forEach(pack::addProvider);
         factories.forEach(pack::addProvider);
@@ -183,7 +205,7 @@ public final class DatagenCollectors {
     /**
      * Selects the readable stores required by a {@link DatagenCollectors} instance.
      *
-     * <p>Both holders must be supplied before {@link #build()}, even when only
+     * <p>All three holders must be supplied before {@link #build()}, even when only
      * one provider category will be used. The builder owns one collector and
      * returns that same instance on each successful build. Holder references
      * are assigned directly and are not copied or frozen.</p>
@@ -240,19 +262,29 @@ public final class DatagenCollectors {
             return this;
         }
 
+        /**
+         * Selects the recipe holder used by {@link RecipesGenerator}.
+         *
+         * <p>The reference replaces the previous selection. A {@code null}
+         * selection is rejected when {@link #build()} validates the configuration.</p>
+         *
+         * @param recipesHolder the holder required by the recipe provider;
+         *                      may be {@code null} here but must be set before {@link #build()}
+         * @return this configuration builder
+         */
         public DataProviderConfiguration recipeHolder(ReadableRecipeRegistrablesHolder recipesHolder) {
             this.collectors.recipesHolder = recipesHolder;
             return this;
         }
 
         /**
-         * Validates both holder selections and returns the configured collector.
+         * Validates all holder selections and returns the configured collector.
          *
          * <p>The returned collector is the same mutable instance owned by this
          * builder. Building does not create providers or run data generation.</p>
          *
          * @return the configured {@link DatagenCollectors} for selecting providers
-         * @throws IllegalBuilderPatternConfigurationException if either holder is missing
+         * @throws IllegalBuilderPatternConfigurationException if any required holder is missing
          */
         @Override
         public DatagenCollectors build() {

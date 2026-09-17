@@ -47,7 +47,7 @@ import java.util.function.Function;
  * @see ItemPreRegistrable
  * @see ItemPostRegistrable
  */
-public class ItemRegisterFactory extends RegisterFactoryImpl<Item> {
+public final class ItemRegisterFactory extends RegisterFactoryImpl<Item> {
 
     /**
      * Factory-local list of {@link ItemPostRegistrable} stages.

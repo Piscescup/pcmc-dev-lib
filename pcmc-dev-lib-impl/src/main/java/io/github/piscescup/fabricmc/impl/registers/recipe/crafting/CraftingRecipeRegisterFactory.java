@@ -40,7 +40,7 @@ import org.jetbrains.annotations.NotNull;
  * @see ShapedCraftingRecipeRegistrable
  * @see ShapelessCraftingRecipeRegistrable
  */
-public class CraftingRecipeRegisterFactory
+public final class CraftingRecipeRegisterFactory
     extends RegisterFactoryImpl<Recipe<?>>
 {
 

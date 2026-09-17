@@ -77,26 +77,6 @@ public abstract class Register<
     protected MutableTranslationsHolder translationsHolder;
 
 
-
-    /**
-     * Initializes registration state using the shared translation holder.
-     *
-     * @param registry the target {@link Registry}; must not be {@code null}
-     * @param id       the namespaced {@link Identifier} of the value; must not be {@code null}
-     * @throws NullPointerException if {@code registry} or {@code id} is {@code null}
-     * @see MutableTranslationsHolder#INSTANCE
-     */
-    protected Register(
-        Registry<V> registry,
-        Identifier id
-    ) {
-        this(
-            registry,
-            id,
-            MutableTranslationsHolder.INSTANCE
-        );
-    }
-
     /**
      * Initializes registration state and derives the entry's {@link ResourceKey}.
      *
@@ -111,18 +91,39 @@ public abstract class Register<
      */
     protected Register(
         Registry<V> registry,
+        Identifier id
+    ) {
+        this(
+            registry.key(),
+            id,
+            MutableTranslationsHolder.INSTANCE
+        );
+    }
+
+    protected Register(
+        ResourceKey<? extends Registry<V>> registry,
+        Identifier id
+    ) {
+        this(
+            registry,
+            id,
+            MutableTranslationsHolder.INSTANCE
+        );
+    }
+
+    protected Register(
+        ResourceKey<? extends Registry<V>> registry,
         Identifier id,
         MutableTranslationsHolder translationsHolder
     ) {
         this.id = NullCheck.requireNonNull(id, "id");
-        this.registry = NullCheck.requireNonNull(registry, "registry");
         this.translationsHolder = NullCheck.requireNonNull(
             translationsHolder,
             "translationsHolder"
         );
 
         this.resourceKey = ResourceKey.create(
-            registry.key(),
+            registry,
             this.id
         );
     }

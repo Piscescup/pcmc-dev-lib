@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
  * @see CreativeModeTabPreRegistrable
  * @see io.github.piscescup.fabricmc.api.registers.creativetab.CreativeModeTabPostRegistrable
  */
-public class CreativeModeTabRegisterFactory
+public final class CreativeModeTabRegisterFactory
     extends RegisterFactoryImpl<CreativeModeTab>
 {
     /**

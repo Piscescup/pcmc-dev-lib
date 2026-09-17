@@ -12,6 +12,9 @@
     "sources": "https://github.com/Piscescup/pcmc-dev-lib",
     "issues": "https://github.com/Piscescup/pcmc-dev-lib/issues"
   },
+  "mixins": [
+    "pcmc-dev-lib.mixins.json"
+  ],
   "license": "Apache-2.0",
   "icon": "assets/pcmc-dev-lib-impl/icon.png",
   "environment": "*",

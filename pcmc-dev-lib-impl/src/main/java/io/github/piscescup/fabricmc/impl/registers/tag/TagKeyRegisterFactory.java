@@ -1,5 +1,6 @@
 package io.github.piscescup.fabricmc.impl.registers.tag;
 
+import io.github.piscescup.fabricmc.api.registers.tag.TagKeyPostRegistrable;
 import io.github.piscescup.fabricmc.api.registers.tag.TagKeyPreRegistrable;
 import io.github.piscescup.fabricmc.impl.registers.RegisterFactoryImpl;
 import io.github.piscescup.util.validation.NullCheck;
@@ -58,7 +59,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0.0
  * @see TagKeyRegister
  * @see TagKeyPreRegistrable
- * @see io.github.piscescup.fabricmc.api.registers.tag.TagKeyPostRegistrable
+ * @see TagKeyPostRegistrable
  */
 public final class TagKeyRegisterFactory<T>
     extends RegisterFactoryImpl<T>

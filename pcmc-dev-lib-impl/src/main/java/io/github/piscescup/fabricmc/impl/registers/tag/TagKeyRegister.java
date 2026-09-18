@@ -1,7 +1,7 @@
 package io.github.piscescup.fabricmc.impl.registers.tag;
 
-import io.github.piscescup.fabricmc.api.registers.tag.TagKeyPostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.tag.TagKeyPreRegistrable;
+import io.github.piscescup.fabricmc.api.tag.TagKeyPostRegistrable;
+import io.github.piscescup.fabricmc.api.tag.TagKeyPreRegistrable;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.impl.store.lang.MutableTranslationsHolder;
 import io.github.piscescup.fabricmc.impl.store.tag.MutableTagKeysHolder;

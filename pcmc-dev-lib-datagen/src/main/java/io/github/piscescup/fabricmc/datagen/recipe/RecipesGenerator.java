@@ -1,6 +1,6 @@
 package io.github.piscescup.fabricmc.datagen.recipe;
 
-import io.github.piscescup.fabricmc.api.registers.recipe.RecipeRegistrable;
+import io.github.piscescup.fabricmc.api.recipe.RecipeRegistrable;
 import io.github.piscescup.fabricmc.store.recipe.ReadableRecipeRegistrablesHolder;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;

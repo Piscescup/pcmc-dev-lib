@@ -1,7 +1,7 @@
 package io.github.piscescup.fabricmc.impl.registers;
 
-import io.github.piscescup.fabricmc.api.registers.PostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.PreRegistrable;
+import io.github.piscescup.fabricmc.api.PostRegistrable;
+import io.github.piscescup.fabricmc.api.PreRegistrable;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.impl.store.lang.MutableTranslationsHolder;
 import io.github.piscescup.util.validation.NullCheck;

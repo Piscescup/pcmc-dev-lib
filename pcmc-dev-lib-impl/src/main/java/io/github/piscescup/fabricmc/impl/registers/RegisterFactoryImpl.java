@@ -1,6 +1,6 @@
 package io.github.piscescup.fabricmc.impl.registers;
 
-import io.github.piscescup.fabricmc.api.registers.RegisterFactory;
+import io.github.piscescup.fabricmc.api.RegisterFactory;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;

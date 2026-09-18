@@ -1,7 +1,7 @@
 package io.github.piscescup.fabricmc.impl.registers.block;
 
-import io.github.piscescup.fabricmc.api.registers.block.BlockPostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.block.BlockPreRegistrable;
+import io.github.piscescup.fabricmc.api.block.BlockPostRegistrable;
+import io.github.piscescup.fabricmc.api.block.BlockPreRegistrable;
 import io.github.piscescup.fabricmc.impl.registers.Register;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.Registry;

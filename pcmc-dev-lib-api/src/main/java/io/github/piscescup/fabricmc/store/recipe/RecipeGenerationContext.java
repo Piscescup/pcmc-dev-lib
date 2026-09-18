@@ -1,6 +1,6 @@
 package io.github.piscescup.fabricmc.store.recipe;
 
-import io.github.piscescup.fabricmc.api.registers.recipe.RecipeRegistrable;
+import io.github.piscescup.fabricmc.api.recipe.RecipeRegistrable;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;

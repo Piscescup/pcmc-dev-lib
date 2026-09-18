@@ -5,9 +5,11 @@ import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.datagen.lang.LanguageProvider;
 import io.github.piscescup.fabricmc.datagen.recipe.RecipesGenerator;
 import io.github.piscescup.fabricmc.datagen.tag.TagProvider;
+import io.github.piscescup.fabricmc.datagen.tag.VillagerTradeGenerator;
 import io.github.piscescup.fabricmc.store.lang.ReadableTranslationsHolder;
 import io.github.piscescup.fabricmc.store.recipe.ReadableRecipeRegistrablesHolder;
 import io.github.piscescup.fabricmc.store.tag.ReadableTagKeysHolder;
+import io.github.piscescup.fabricmc.store.villager.trade.ReadableVillagerTradesHolder;
 import io.github.piscescup.interfaces.Builder;
 import io.github.piscescup.util.validation.NullCheck;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -81,6 +83,8 @@ public final class DatagenCollectors {
      * this reference when they are invoked.
      */
     private ReadableRecipeRegistrablesHolder recipesHolder;
+
+    private ReadableVillagerTradesHolder villagerTradesHolder;
 
     /**
      * Ordered {@link FabricDataGenerator.Pack.RegistryDependentFactory} queue.
@@ -182,6 +186,13 @@ public final class DatagenCollectors {
         return this;
     }
 
+    public DatagenCollectors villagerTradesProvider() {
+        registryDependentFactories.add(
+            (packOutput, lookupProvider) ->
+                new VillagerTradeGenerator(packOutput, lookupProvider, this.villagerTradesHolder)
+        );
+        return this;
+    }
 
     /**
      * Attaches the queued provider factories to a {@link FabricDataGenerator.Pack}.
@@ -277,6 +288,11 @@ public final class DatagenCollectors {
             return this;
         }
 
+        public DataProviderConfiguration villagerTradesProvider(ReadableVillagerTradesHolder tradesHolder) {
+            this.collectors.villagerTradesHolder = tradesHolder;
+            return this;
+        }
+
         /**
          * Validates all holder selections and returns the configured collector.
          *
@@ -301,6 +317,11 @@ public final class DatagenCollectors {
             if (this.collectors.recipesHolder == null)
                 throw IllegalBuilderPatternConfigurationException.missing(
                     "recipeHolder"
+                );
+
+            if  (this.collectors.villagerTradesHolder == null)
+                throw IllegalBuilderPatternConfigurationException.missing(
+                    "villagerTradesHolder"
                 );
 
             return this.collectors;

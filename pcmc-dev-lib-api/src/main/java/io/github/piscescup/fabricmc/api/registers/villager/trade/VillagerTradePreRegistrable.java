@@ -1,10 +1,10 @@
 package io.github.piscescup.fabricmc.api.registers.villager.trade;
 
 import io.github.piscescup.fabricmc.api.registers.PreRegistrable;
+import io.github.piscescup.fabricmc.store.villager.trade.TradeLevel;
 import net.minecraft.world.item.trading.VillagerTrade;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * @author REN YuanTong
@@ -13,38 +13,40 @@ import java.util.Collection;
 public interface VillagerTradePreRegistrable
     extends PreRegistrable<VillagerTrade, VillagerTrade, VillagerTradePreRegistrable, VillagerTradePostRegistrable>
 {
-    VillagerTradePreRegistrable novice(VillagerTrade noviceTrade);
 
-    default VillagerTradePreRegistrable novice(@NotNull Collection<VillagerTrade> noviceTrades) {
-        noviceTrades.forEach(this::novice);
-        return this;
+    VillagerTradePreRegistrable level(
+        TradeLevel level,
+        Consumer<VillagerLevelTradeBuilder> action
+    );
+
+    default VillagerTradePreRegistrable novice(
+        Consumer<VillagerLevelTradeBuilder> action
+    ) {
+        return level(TradeLevel.NOVICE, action);
     }
 
-    VillagerTradePreRegistrable apprentice(VillagerTrade apprenticeTrade);
-
-    default VillagerTradePreRegistrable apprentice(@NotNull Collection<VillagerTrade> apprenticeTrades) {
-        apprenticeTrades.forEach(this::apprentice);
-        return this;
+    default VillagerTradePreRegistrable apprentice(
+        Consumer<VillagerLevelTradeBuilder> action
+    ) {
+        return level(TradeLevel.APPRENTICE, action);
     }
 
-    VillagerTradePreRegistrable journeyman(VillagerTrade journeymanTrade);
-
-    default VillagerTradePreRegistrable journeyman(@NotNull Collection<VillagerTrade> journeymanTrades) {
-        journeymanTrades.forEach(this::journeyman);
-        return this;
+    default VillagerTradePreRegistrable journeyman(
+        Consumer<VillagerLevelTradeBuilder> action
+    ) {
+        return level(TradeLevel.JOURNEYMAN, action);
     }
 
-    VillagerTradePreRegistrable expert(VillagerTrade expertTrade);
-
-    default VillagerTradePreRegistrable expert(@NotNull Collection<VillagerTrade> expertTrades) {
-        expertTrades.forEach(this::expert);
-        return this;
+    default VillagerTradePreRegistrable expert(
+        Consumer<VillagerLevelTradeBuilder> action
+    ) {
+        return level(TradeLevel.EXPERT, action);
     }
 
-    VillagerTradePreRegistrable master(VillagerTrade masterTrade);
-
-    default VillagerTradePreRegistrable master(@NotNull Collection<VillagerTrade> masterTrades) {
-        masterTrades.forEach(this::master);
-        return this;
+    default VillagerTradePreRegistrable master(
+        Consumer<VillagerLevelTradeBuilder> action
+    ) {
+        return level(TradeLevel.MASTER, action);
     }
+
 }

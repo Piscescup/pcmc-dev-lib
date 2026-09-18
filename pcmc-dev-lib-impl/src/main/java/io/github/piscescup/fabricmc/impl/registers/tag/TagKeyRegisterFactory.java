@@ -1,7 +1,7 @@
 package io.github.piscescup.fabricmc.impl.registers.tag;
 
-import io.github.piscescup.fabricmc.api.registers.tag.TagKeyPostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.tag.TagKeyPreRegistrable;
+import io.github.piscescup.fabricmc.api.tag.TagKeyPostRegistrable;
+import io.github.piscescup.fabricmc.api.tag.TagKeyPreRegistrable;
 import io.github.piscescup.fabricmc.impl.registers.RegisterFactoryImpl;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.Registry;

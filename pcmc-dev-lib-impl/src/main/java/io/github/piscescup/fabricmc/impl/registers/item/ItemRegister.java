@@ -1,7 +1,7 @@
 package io.github.piscescup.fabricmc.impl.registers.item;
 
-import io.github.piscescup.fabricmc.api.registers.item.ItemPostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.item.ItemPreRegistrable;
+import io.github.piscescup.fabricmc.api.item.ItemPostRegistrable;
+import io.github.piscescup.fabricmc.api.item.ItemPreRegistrable;
 import io.github.piscescup.fabricmc.impl.registers.Register;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.Registry;

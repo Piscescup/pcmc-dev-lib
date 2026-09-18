@@ -1,13 +1,15 @@
 package io.github.piscescup.fabricmc.impl.registers.villager;
 
 import com.google.common.collect.ImmutableSet;
-import io.github.piscescup.fabricmc.api.registers.PostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.villager.VillagerProfessionPostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.villager.VillagerProfessionPreRegistrable;
+import io.github.piscescup.fabricmc.api.villager.VillagerProfessionPostRegistrable;
+import io.github.piscescup.fabricmc.api.villager.VillagerProfessionPreRegistrable;
 import io.github.piscescup.fabricmc.impl.registers.Register;
+import io.github.piscescup.util.validation.NullCheck;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -17,8 +19,8 @@ import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.trading.TradeSet;
 import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -27,10 +29,9 @@ import java.util.function.Predicate;
  * @author REN YuanTong
  * @since
  */
-public class VillagerProfessionRegister
+public final class VillagerProfessionRegister
     extends Register<VillagerProfession, VillagerProfession, VillagerProfessionPreRegistrable, VillagerProfessionPostRegistrable>
-    implements VillagerProfessionPreRegistrable, VillagerProfessionPostRegistrable,
-                VillagerProfessionPreRegistrable.JobSite
+    implements VillagerProfessionPreRegistrable.HeldJobSite, VillagerProfessionPreRegistrable, VillagerProfessionPostRegistrable
 {
     private Component name;
     private Predicate<Holder<PoiType>> heldJobSite;
@@ -41,62 +42,72 @@ public class VillagerProfessionRegister
     private Int2ObjectMap<ResourceKey<TradeSet>> tradeSetsByLevel;
 
     VillagerProfessionRegister(Identifier id) {
-        super(BuiltInRegistries.VILLAGER_PROFESSION, id);
+        super(Registries.VILLAGER_PROFESSION, id);
     }
 
-    /**
-     * Derives the translation key used for localized display text.
-     *
-     * <p>Implementations may obtain the key from the registered value, so this
-     * method is used after registration has completed successfully.</p>
-     *
-     * @return the non-null, non-blank translation key
-     */
     @Override
     protected String translateKey() {
-        return "entity." + this.id.getNamespace() + ".villager." + this.id.getPath();
+        return "entity." + id.getNamespace() + ".villager." + id.getPath();
     }
 
-    /**
-     * Completes the pre-registration configuration, registers the object into the
-     * target registry, and returns the matching
-     * {@link PostRegistrable post-registration stage}.
-     *
-     * <p>This method is the terminal operation of the pre-registration stage.
-     * In typical implementations, the returned post-registration stage may be the
-     * same object as this pre-registration stage, but it should be used through
-     * the {@code POST} interface for subsequent customization.</p>
-     *
-     * @return the matching post-registration stage
-     * @see PostRegistrable
-     */
     @Override
-    public @NotNull VillagerProfessionPostRegistrable register() {
+    public VillagerProfessionPreRegistrable heldJobSite(Predicate<Holder<PoiType>> heldJobSite) {
+        NullCheck.requireNonNull(heldJobSite, "heldJobSite");
+
+        this.heldJobSite = heldJobSite;
+        this.acquirableJobSite = heldJobSite;
         return this;
     }
 
     @Override
     public VillagerProfessionPreRegistrable acquirableJobSite(Predicate<Holder<PoiType>> acquirableJobSite) {
+        NullCheck.requireNonNull(acquirableJobSite, "acquirableJobSite");
+        this.acquirableJobSite = acquirableJobSite;
         return this;
     }
 
     @Override
-    public VillagerProfessionPreRegistrable requestedItems(ImmutableSet<Item> requiredItems) {
+    public VillagerProfessionPreRegistrable requestedItems(ImmutableSet<Item> requestedItems) {
+        NullCheck.requireAllNonNull(requestedItems);
+        this.requestedItems = requestedItems;
         return this;
     }
 
     @Override
     public VillagerProfessionPreRegistrable secondaryPoi(ImmutableSet<Block> secondaryPoi) {
+        NullCheck.requireAllNonNull(secondaryPoi);
+        this.secondaryPoi = secondaryPoi;
         return this;
     }
 
     @Override
-    public VillagerProfessionPreRegistrable workSound(@Nullable SoundEvent sound) {
+    public VillagerProfessionPreRegistrable workSound(@Nullable SoundEvent workSound) {
+        this.workSound = workSound;
         return this;
     }
 
     @Override
-    public VillagerProfessionPreRegistrable jobSite(Predicate<Holder<PoiType>> heldJobSite) {
+    public VillagerProfessionPreRegistrable tradeSetsByLevel(Int2ObjectMap<ResourceKey<TradeSet>> tradeSetsByLevel) {
+        this.tradeSetsByLevel = tradeSetsByLevel;
         return this;
     }
+
+    @Override
+    public @NonNull VillagerProfessionPostRegistrable register() {
+        this.thingToBeRegistered = Registry.register(
+            BuiltInRegistries.VILLAGER_PROFESSION,
+            this.id,
+            new VillagerProfession(
+                Component.translatable(translateKey()),
+                heldJobSite,
+                acquirableJobSite,
+                requestedItems,
+                secondaryPoi,
+                workSound,
+                tradeSetsByLevel
+            )
+        );
+        return this;
+    }
+
 }

@@ -1,7 +1,7 @@
 package io.github.piscescup.fabricmc.impl.registers.recipe.crafting;
 
-import io.github.piscescup.fabricmc.api.registers.recipe.crafting.ShapedCraftingRecipeRegistrable;
-import io.github.piscescup.fabricmc.api.registers.recipe.crafting.ShapelessCraftingRecipeRegistrable;
+import io.github.piscescup.fabricmc.api.recipe.crafting.ShapedCraftingRecipeRegistrable;
+import io.github.piscescup.fabricmc.api.recipe.crafting.ShapelessCraftingRecipeRegistrable;
 import io.github.piscescup.fabricmc.impl.registers.RegisterFactoryImpl;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.registries.Registries;

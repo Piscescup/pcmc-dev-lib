@@ -1,8 +1,8 @@
 package io.github.piscescup.fabricmc.impl.registers.poi;
 
-import io.github.piscescup.fabricmc.api.registers.PostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.poi.POIPostRegistrable;
-import io.github.piscescup.fabricmc.api.registers.poi.POIPreRegistrable;
+import io.github.piscescup.fabricmc.api.PostRegistrable;
+import io.github.piscescup.fabricmc.api.poi.POIPostRegistrable;
+import io.github.piscescup.fabricmc.api.poi.POIPreRegistrable;
 import io.github.piscescup.fabricmc.impl.mixins.vanilla.PoiTypesMixin;
 import io.github.piscescup.fabricmc.impl.registers.Register;
 import io.github.piscescup.util.validation.ArgumentCheck;

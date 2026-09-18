@@ -1,6 +1,6 @@
 package io.github.piscescup.fabricmc.impl.registers.poi;
 
-import io.github.piscescup.fabricmc.api.registers.poi.POIPreRegistrable;
+import io.github.piscescup.fabricmc.api.poi.POIPreRegistrable;
 import io.github.piscescup.fabricmc.impl.registers.RegisterFactoryImpl;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.registries.Registries;

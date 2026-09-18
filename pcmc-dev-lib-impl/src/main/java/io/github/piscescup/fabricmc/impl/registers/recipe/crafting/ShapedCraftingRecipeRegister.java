@@ -1,6 +1,6 @@
 package io.github.piscescup.fabricmc.impl.registers.recipe.crafting;
 
-import io.github.piscescup.fabricmc.api.registers.recipe.crafting.ShapedCraftingRecipeRegistrable;
+import io.github.piscescup.fabricmc.api.recipe.crafting.ShapedCraftingRecipeRegistrable;
 import io.github.piscescup.fabricmc.impl.registers.recipe.RecipeRegister;
 import io.github.piscescup.fabricmc.impl.store.recipe.ItemCriterionHolderImpl;
 import io.github.piscescup.fabricmc.impl.store.recipe.TagCriterionHolderImpl;

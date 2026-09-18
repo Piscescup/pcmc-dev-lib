@@ -1,12 +1,14 @@
 package io.github.piscescup.fabricmc.impl.store.village.trade;
 
+import io.github.piscescup.fabricmc.api.trade.VillagerLevelTradeMetadata;
 import io.github.piscescup.fabricmc.store.villager.trade.ReadableVillagerTradesHolder;
-import io.github.piscescup.fabricmc.store.villager.trade.VillagerTrades;
+import io.github.piscescup.fabricmc.store.villager.trade.TradeLevel;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.trading.VillagerTrade;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -18,22 +20,92 @@ public enum MutableVillagerTradeHolder
 {
     INSTANCE;
 
-    private final Map<ResourceKey<VillagerTrade>, VillagerTrades> levels =
+    private final Map<ResourceKey<VillagerProfession>, EnumMap<TradeLevel, VillagerLevelTradeMetadata>> professions =
         new LinkedHashMap<>();
 
-    public void add(ResourceKey<VillagerTrade> key, VillagerTrades trades) {
-        VillagerTrades pre = levels.put(key, trades);
+    /**
+     * Adds one profession-level metadata entry.
+     *
+     * @throws IllegalStateException if different metadata has already been
+     *                               declared for the same profession and level
+     */
+    public void add(
+        @NotNull ResourceKey<VillagerProfession> profession,
+        @NotNull VillagerLevelTradeMetadata metadata
+    ) {
+        Objects.requireNonNull(profession, "profession");
+        Objects.requireNonNull(metadata, "metadata");
 
-        if (pre != null) {
+        EnumMap<TradeLevel, VillagerLevelTradeMetadata> levels =
+            professions.computeIfAbsent(
+                profession,
+                ignored -> new EnumMap<>(TradeLevel.class)
+            );
+
+        VillagerLevelTradeMetadata previous =
+            levels.putIfAbsent(
+                metadata.level(),
+                metadata
+            );
+
+        if (previous != null && !previous.equals(metadata)) {
             throw new IllegalStateException(
-                "Duplicate trades: " + pre
+                "Duplicate villager profession trade metadata: "
+                + profession.identifier()
+                + ", level="
+                + metadata.level()
             );
         }
     }
 
+    @Override
+    public @Nullable VillagerLevelTradeMetadata searchByLevel(
+        @NotNull ResourceKey<VillagerProfession> profession,
+        @NotNull TradeLevel level
+    ) {
+        Objects.requireNonNull(profession, "profession");
+        Objects.requireNonNull(level, "level");
+
+        Map<TradeLevel, VillagerLevelTradeMetadata> levels =
+            professions.get(profession);
+
+        return levels == null
+            ? null
+            : levels.get(level);
+    }
 
     @Override
-    public Map<ResourceKey<VillagerTrade>, VillagerTrades> all() {
-        return levels;
+    public @NotNull Map<TradeLevel, VillagerLevelTradeMetadata> tradesOf(
+        @NotNull ResourceKey<VillagerProfession> profession
+    ) {
+        Objects.requireNonNull(profession, "profession");
+
+        EnumMap<TradeLevel, VillagerLevelTradeMetadata> levels =
+            professions.get(profession);
+
+        if (levels == null) {
+            return Map.of();
+        }
+
+        return Collections.unmodifiableMap(
+            new EnumMap<>(levels)
+        );
+    }
+
+    @Override
+    public @NotNull Map<ResourceKey<VillagerProfession>, Map<TradeLevel, VillagerLevelTradeMetadata>> allTrades() {
+        Map<ResourceKey<VillagerProfession>, Map<TradeLevel, VillagerLevelTradeMetadata>> result = new LinkedHashMap<>();
+
+        professions.forEach(
+            (profession, levels) ->
+                result.put(
+                    profession,
+                    Collections.unmodifiableMap(
+                        new EnumMap<>(levels)
+                    )
+                )
+        );
+
+        return Collections.unmodifiableMap(result);
     }
 }

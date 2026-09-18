@@ -1,6 +1,7 @@
 package io.github.piscescup.fabricmc.impl.registers.creativetab;
 
-import io.github.piscescup.fabricmc.api.registers.creativetab.CreativeModeTabPreRegistrable;
+import io.github.piscescup.fabricmc.api.creativetab.CreativeModeTabPostRegistrable;
+import io.github.piscescup.fabricmc.api.creativetab.CreativeModeTabPreRegistrable;
 import io.github.piscescup.fabricmc.impl.registers.RegisterFactoryImpl;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.registries.Registries;
@@ -32,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0.0
  * @see CreativeModeTabRegister
  * @see CreativeModeTabPreRegistrable
- * @see io.github.piscescup.fabricmc.api.registers.creativetab.CreativeModeTabPostRegistrable
+ * @see CreativeModeTabPostRegistrable
  */
 public final class CreativeModeTabRegisterFactory
     extends RegisterFactoryImpl<CreativeModeTab>

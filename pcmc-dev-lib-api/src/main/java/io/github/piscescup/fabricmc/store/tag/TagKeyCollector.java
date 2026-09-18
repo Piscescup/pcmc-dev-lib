@@ -1,5 +1,6 @@
 package io.github.piscescup.fabricmc.store.tag;
 
+import io.github.piscescup.fabricmc.api.tag.TagKeyPreRegistrable;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,7 @@ import java.util.Set;
  * @author REN YuanTong
  * @since 1.0.0
  * @see ReadableTagKeysHolder
- * @see io.github.piscescup.fabricmc.api.registers.tag.TagKeyPreRegistrable
+ * @see TagKeyPreRegistrable
  */
 public interface TagKeyCollector<T> {
     /**

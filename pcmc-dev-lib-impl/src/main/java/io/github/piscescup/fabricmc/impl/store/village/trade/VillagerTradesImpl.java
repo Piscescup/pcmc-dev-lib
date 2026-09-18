@@ -2,12 +2,10 @@ package io.github.piscescup.fabricmc.impl.store.village.trade;
 
 import io.github.piscescup.fabricmc.store.villager.trade.TradeLevel;
 import io.github.piscescup.fabricmc.store.villager.trade.VillagerTrades;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.trading.VillagerTrade;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.Optional;
+import java.util.*;
 
 /**
  *
@@ -17,19 +15,23 @@ import java.util.Optional;
 public class VillagerTradesImpl
     implements VillagerTrades
 {
-    private final EnumMap<TradeLevel, Collection<VillagerTrade>> trades;
+    private final Map<TradeLevel, Collection<ResourceKey<VillagerTrade>>> trades = new EnumMap<>(TradeLevel.class);
 
-    public VillagerTradesImpl() {
-        this.trades = new EnumMap<>(TradeLevel.class);
-    }
+    public void add(
+        TradeLevel level,
+        ResourceKey<VillagerTrade> tradeKey
+    ) {
+        Objects.requireNonNull(level, "key");
+        Objects.requireNonNull(tradeKey, "tradeKey");
 
-    public boolean add(TradeLevel level, VillagerTrade trade) {
-        return this.trades.computeIfAbsent(level, _ -> new ArrayList<>())
-            .add(trade);
+        trades
+            .computeIfAbsent(level, _ -> new ArrayList<>())
+            .add(tradeKey);
+
     }
 
     @Override
-    public Optional<Collection<VillagerTrade>> tradeSetByLevel(TradeLevel level) {
-        return Optional.empty();
+    public Map<TradeLevel, Collection<ResourceKey<VillagerTrade>>> trades() {
+        return trades;
     }
 }

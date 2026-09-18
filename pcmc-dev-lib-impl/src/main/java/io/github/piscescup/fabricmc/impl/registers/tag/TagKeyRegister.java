@@ -188,7 +188,7 @@ public class TagKeyRegister<T>
     public TagKeyPreRegistrable<T> addRegistryKey(@NotNull ResourceKey<T> key) {
         NullCheck.requireNonNull(key, "key");
         MutableTagKeysHolder.INSTANCE.addEntry(this.tagKey, key);
-        return null;
+        return this;
     }
 
     /**

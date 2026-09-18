@@ -1,10 +1,15 @@
 package io.github.piscescup.fabricmc.api.registers.villager;
 
+import com.google.common.collect.ImmutableSet;
 import io.github.piscescup.fabricmc.api.registers.PreRegistrable;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -25,15 +30,14 @@ public interface VillagerProfessionPreRegistrable
             return jobSite(poiType -> poiType.is(jobSite));
         }
     }
-    //
-    // VillagerProfessionPreRegistrable acquirableJobSite(Predicate<Holder<PoiType>> acquirableJobSite);
-    //
-    // VillagerProfessionPreRegistrable requestedItems(ImmutableSet<Item> requiredItems);
-    //
-    // VillagerProfessionPreRegistrable secondaryPoi(ImmutableSet<Block> secondaryPoi);
-    //
-    // VillagerProfessionPreRegistrable workSound(@Nullable SoundEvent sound);
-    //
-    // VillagerProfessionPreRegistrable novice();
+
+    VillagerProfessionPreRegistrable acquirableJobSite(Predicate<Holder<PoiType>> acquirableJobSite);
+
+    VillagerProfessionPreRegistrable requestedItems(ImmutableSet<Item> requiredItems);
+
+    VillagerProfessionPreRegistrable secondaryPoi(ImmutableSet<Block> secondaryPoi);
+
+    VillagerProfessionPreRegistrable workSound(@Nullable SoundEvent sound);
+
 
 }

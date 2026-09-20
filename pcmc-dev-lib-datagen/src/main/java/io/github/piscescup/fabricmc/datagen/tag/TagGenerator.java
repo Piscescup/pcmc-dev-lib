@@ -1,6 +1,7 @@
 package io.github.piscescup.fabricmc.datagen.tag;
 
 
+import io.github.piscescup.fabricmc.datagen.DataGeneratorCollectors;
 import io.github.piscescup.fabricmc.store.tag.ReadableTagKeysHolder;
 import io.github.piscescup.fabricmc.store.tag.TagKeyCollector;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
@@ -46,9 +47,9 @@ import java.util.stream.Stream;
  * @since 1.0.0
  * @see ReadableTagKeysHolder
  * @see TagKeyCollector
- * @see io.github.piscescup.fabricmc.datagen.DatagenCollectors
+ * @see DataGeneratorCollectors
  */
-public class TagProvider<T> extends FabricTagsProvider<T> {
+public class TagGenerator<T> extends FabricTagsProvider<T> {
     /**
      * The {@link TagKeyCollector} list obtained from the holder at construction time.
      * Retained as-is and reused by {@link #addTags(HolderLookup.Provider)};
@@ -57,7 +58,7 @@ public class TagProvider<T> extends FabricTagsProvider<T> {
     private final List<TagKeyCollector<T>> collectors;
 
     /**
-     * Creates a {@link TagProvider} and obtains declarations for its target {@link Registry}.
+     * Creates a {@link TagGenerator} and obtains declarations for its target {@link Registry}.
      *
      * <p>The collector list returned by the holder is retained for generation.
      * No second holder lookup is performed when {@link #addTags(HolderLookup.Provider)} runs.</p>
@@ -68,7 +69,7 @@ public class TagProvider<T> extends FabricTagsProvider<T> {
      * @param tagKeysHolder        the {@link ReadableTagKeysHolder} supplying declarations; must not be {@code null}
      * @throws NullPointerException if {@code tagKeysHolder} is {@code null}
      */
-    public TagProvider(
+    public TagGenerator(
         FabricPackOutput output,
         ResourceKey<? extends Registry<T>> resourceKey,
         CompletableFuture<HolderLookup.Provider> registryLookupFuture,

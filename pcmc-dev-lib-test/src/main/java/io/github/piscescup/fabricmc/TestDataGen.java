@@ -2,7 +2,7 @@ package io.github.piscescup.fabricmc;
 
 
 import io.github.piscescup.fabricmc.constants.MCLanguage;
-import io.github.piscescup.fabricmc.datagen.DatagenCollectors;
+import io.github.piscescup.fabricmc.datagen.DataGeneratorCollectors;
 import io.github.piscescup.fabricmc.impl.store.MutableReciperegistrablesHolder;
 import io.github.piscescup.fabricmc.impl.store.lang.MutableTranslationsHolder;
 import io.github.piscescup.fabricmc.impl.store.tag.MutableTagKeysHolder;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0.0
  */
 public class TestDataGen implements DataGeneratorEntrypoint {
-    private final DatagenCollectors collectors = DatagenCollectors.configuration()
+    private final DataGeneratorCollectors collectors = DataGeneratorCollectors.configuration()
         .translationHolder(MutableTranslationsHolder.INSTANCE)
             .tagKeyHolder(MutableTagKeysHolder.INSTANCE)
             .recipeHolder(MutableReciperegistrablesHolder.INSTANCE)

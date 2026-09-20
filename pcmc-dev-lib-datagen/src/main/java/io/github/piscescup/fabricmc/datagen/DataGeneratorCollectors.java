@@ -2,9 +2,9 @@ package io.github.piscescup.fabricmc.datagen;
 
 import io.github.piscescup.exception.IllegalBuilderPatternConfigurationException;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
-import io.github.piscescup.fabricmc.datagen.lang.LanguageProvider;
+import io.github.piscescup.fabricmc.datagen.lang.LanguageGenerator;
 import io.github.piscescup.fabricmc.datagen.recipe.RecipesGenerator;
-import io.github.piscescup.fabricmc.datagen.tag.TagProvider;
+import io.github.piscescup.fabricmc.datagen.tag.TagGenerator;
 import io.github.piscescup.fabricmc.datagen.tag.VillagerTradeTagGenerator;
 import io.github.piscescup.fabricmc.datagen.trade.TradeSetRegistryGenerator;
 import io.github.piscescup.fabricmc.datagen.trade.VillagerTradeDatagenModel;
@@ -62,21 +62,21 @@ import java.util.function.Consumer;
  * @author REN YuanTong
  * @since 1.0.0
  * @see DataProviderConfiguration
- * @see LanguageProvider
- * @see TagProvider
+ * @see LanguageGenerator
+ * @see TagGenerator
  * @see RecipesGenerator
  */
-public final class DatagenCollectors {
+public final class DataGeneratorCollectors {
     /**
      * The {@link ReadableTranslationsHolder} selected by the configuration builder.
-     * Initially {@code null}; queued {@link LanguageProvider} factories consult
+     * Initially {@code null}; queued {@link LanguageGenerator} factories consult
      * this reference when they are invoked.
      */
     private ReadableTranslationsHolder translationsHolder;
 
     /**
      * The {@link ReadableTagKeysHolder} selected by the configuration builder.
-     * Initially {@code null}; queued {@link TagProvider} factories consult
+     * Initially {@code null}; queued {@link TagGenerator} factories consult
      * this reference when they are invoked.
      */
     private ReadableTagKeysHolder tagKeysHolder;
@@ -121,7 +121,7 @@ public final class DatagenCollectors {
      *
      * @see #configuration()
      */
-    public DatagenCollectors() {}
+    public DataGeneratorCollectors() {}
 
 
     /**
@@ -136,7 +136,7 @@ public final class DatagenCollectors {
     }
 
     /**
-     * Queues a {@link LanguageProvider} for the selected {@link MCLanguage}.
+     * Queues a {@link LanguageGenerator} for the selected {@link MCLanguage}.
      *
      * <p>The provider factory obtains the language's translation set from the
      * configured holder when invoked. Repeated calls enqueue additional factories;
@@ -147,17 +147,17 @@ public final class DatagenCollectors {
      * @throws NullPointerException if {@code language} is {@code null}
      * @see #generate(FabricDataGenerator.Pack)
      */
-    public DatagenCollectors langProvider(MCLanguage language) {
+    public DataGeneratorCollectors langProvider(MCLanguage language) {
         NullCheck.requireNonNull(language, "language");
         registryDependentFactories.add(
             (packOutput, lookupProvider) ->
-                new LanguageProvider(packOutput, lookupProvider, language, translationsHolder.translations(language))
+                new LanguageGenerator(packOutput, lookupProvider, language, translationsHolder.translations(language))
         );
         return this;
     }
 
     /**
-     * Queues a {@link TagProvider} for the selected {@link Registry}.
+     * Queues a {@link TagGenerator} for the selected {@link Registry}.
      *
      * <p>The provider reads the configured tag holder when constructed.
      * Repeated calls enqueue additional factories without deduplicating registries.</p>
@@ -168,12 +168,12 @@ public final class DatagenCollectors {
      * @throws NullPointerException if {@code registry} is {@code null}
      * @see #generate(FabricDataGenerator.Pack)
      */
-    public <T> DatagenCollectors tagProvider(ResourceKey<? extends Registry<T>> registry) {
+    public <T> DataGeneratorCollectors tagProvider(ResourceKey<? extends Registry<T>> registry) {
         NullCheck.requireNonNull(registry, "registry");
 
         registryDependentFactories.add(
             (packOutput, lookupProvider) ->
-                new TagProvider<>(packOutput, registry, lookupProvider, this.tagKeysHolder)
+                new TagGenerator<>(packOutput, registry, lookupProvider, this.tagKeysHolder)
         );
 
         return this;
@@ -189,7 +189,7 @@ public final class DatagenCollectors {
      * @return this collector for further provider selection
      * @see #generate(FabricDataGenerator.Pack)
      */
-    public DatagenCollectors recipesProvider() {
+    public DataGeneratorCollectors recipesProvider() {
         registryDependentFactories.add(
             (packOutput, lookupProvider) ->
                 new RecipesGenerator(packOutput, lookupProvider, this.recipesHolder)
@@ -198,7 +198,7 @@ public final class DatagenCollectors {
         return this;
     }
 
-    public DatagenCollectors villagerTradesProvider() {
+    public DataGeneratorCollectors villagerTradesProvider() {
         VillagerTradeDatagenModel model =
             VillagerTradeDatagenModel.create(villagerTradesHolder);
 
@@ -264,7 +264,7 @@ public final class DatagenCollectors {
     }
 
     /**
-     * Selects the readable stores required by a {@link DatagenCollectors} instance.
+     * Selects the readable stores required by a {@link DataGeneratorCollectors} instance.
      *
      * <p>All three holders must be supplied before {@link #build()}, even when only
      * one provider category will be used. The builder owns one collector and
@@ -273,24 +273,24 @@ public final class DatagenCollectors {
      *
      * @author REN YuanTong
      * @since 1.0.0
-     * @see DatagenCollectors#configuration()
+     * @see DataGeneratorCollectors#configuration()
      */
     public static final class DataProviderConfiguration
-        implements Builder<DatagenCollectors>
+        implements Builder<DataGeneratorCollectors>
     {
         /**
-         * The {@link DatagenCollectors} created with this configuration.
+         * The {@link DataGeneratorCollectors} created with this configuration.
          * Setters mutate this same instance, and each successful {@link #build()}
          * returns it without copying its holders or provider queues.
          */
-        private final DatagenCollectors collectors;
+        private final DataGeneratorCollectors collectors;
 
 
         /**
-         * Creates a configuration owning a new, initially unconfigured {@link DatagenCollectors}.
+         * Creates a configuration owning a new, initially unconfigured {@link DataGeneratorCollectors}.
          */
         DataProviderConfiguration() {
-            this.collectors = new DatagenCollectors();
+            this.collectors = new DataGeneratorCollectors();
         }
 
         /**
@@ -299,7 +299,7 @@ public final class DatagenCollectors {
          * <p>The reference replaces the previous selection. A {@code null}
          * selection is rejected when {@link #build()} validates the configuration.</p>
          *
-         * @param translationsHolder the holder required by {@link LanguageProvider};
+         * @param translationsHolder the holder required by {@link LanguageGenerator};
          *                           may be {@code null} here but must be set before {@link #build()}
          * @return this configuration builder
          */
@@ -314,7 +314,7 @@ public final class DatagenCollectors {
          * <p>The reference replaces the previous selection. A {@code null}
          * selection is rejected when {@link #build()} validates the configuration.</p>
          *
-         * @param tagKeysHolder the holder required by {@link TagProvider};
+         * @param tagKeysHolder the holder required by {@link TagGenerator};
          *                      may be {@code null} here but must be set before {@link #build()}
          * @return this configuration builder
          */
@@ -350,11 +350,11 @@ public final class DatagenCollectors {
          * <p>The returned collector is the same mutable instance owned by this
          * builder. Building does not create providers or run data generation.</p>
          *
-         * @return the configured {@link DatagenCollectors} for selecting providers
+         * @return the configured {@link DataGeneratorCollectors} for selecting providers
          * @throws IllegalBuilderPatternConfigurationException if any required holder is missing
          */
         @Override
-        public DatagenCollectors build() {
+        public DataGeneratorCollectors build() {
             if (this.collectors.translationsHolder == null)
                 throw IllegalBuilderPatternConfigurationException.missing(
                     "translationsHolder"

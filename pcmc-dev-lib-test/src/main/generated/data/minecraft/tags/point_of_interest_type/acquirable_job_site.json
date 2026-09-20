@@ -1,0 +1,12 @@
+{
+  "values": [
+    {
+      "id": "minecraft:bee_nest",
+      "required": false
+    },
+    {
+      "id": "pcmc-dev-lib-test:test_poi1",
+      "required": false
+    }
+  ]
+}

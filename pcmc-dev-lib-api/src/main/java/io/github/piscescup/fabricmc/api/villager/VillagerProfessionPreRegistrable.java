@@ -2,14 +2,13 @@ package io.github.piscescup.fabricmc.api.villager;
 
 import com.google.common.collect.ImmutableSet;
 import io.github.piscescup.fabricmc.api.PreRegistrable;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import io.github.piscescup.fabricmc.api.trade.VillagerProfessionTradesPostRegistrable;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.trading.TradeSet;
 import net.minecraft.world.level.block.Block;
 import org.jspecify.annotations.Nullable;
 
@@ -38,6 +37,6 @@ public interface VillagerProfessionPreRegistrable
 
     VillagerProfessionPreRegistrable workSound(@Nullable SoundEvent workSound);
 
-    VillagerProfessionPreRegistrable tradeSetsByLevel(Int2ObjectMap<ResourceKey<TradeSet>> tradeSetsByLevel);
+    VillagerProfessionPreRegistrable tradeSetsByLevel(VillagerProfessionTradesPostRegistrable tradesPostRegistrable);
 
 }

@@ -53,7 +53,7 @@ public class POIRegister
     public MaxTickets matchingStates(@NotNull Set<BlockState> matchingStates) {
         NullCheck.requireNonNull(matchingStates, "matchingStates");
         StateCheck.checkState(
-            matchingStates.isEmpty(), "matchingStates must not be empty."
+            !matchingStates.isEmpty(), "matchingStates must not be empty."
         );
 
         this.matchingStates = matchingStates;

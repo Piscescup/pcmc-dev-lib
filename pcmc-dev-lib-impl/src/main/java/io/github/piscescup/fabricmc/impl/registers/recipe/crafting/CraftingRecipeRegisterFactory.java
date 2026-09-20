@@ -78,6 +78,7 @@ public final class CraftingRecipeRegisterFactory
      * @return a new shapeless-recipe definition
      * @throws NullPointerException if {@code path}, {@code category}, or {@code result} is {@code null}
      */
+    @NotNull
     public ShapelessCraftingRecipeRegistrable shapeless(
         @NotNull String path,
         @NotNull RecipeCategory category,
@@ -100,6 +101,7 @@ public final class CraftingRecipeRegisterFactory
      * @return a new shapeless-recipe definition
      * @see #shapeless(String, RecipeCategory, ItemStackTemplate)
      */
+    @NotNull
     public ShapelessCraftingRecipeRegistrable shapeless(
         @NotNull String path,
         RecipeCategory category,
@@ -119,6 +121,7 @@ public final class CraftingRecipeRegisterFactory
      * @return a new shapeless-recipe definition
      * @see #shapeless(String, RecipeCategory, ItemLike, int)
      */
+    @NotNull
     public ShapelessCraftingRecipeRegistrable shapeless(
         @NotNull String path,
         RecipeCategory category,
@@ -140,6 +143,7 @@ public final class CraftingRecipeRegisterFactory
      * @return a new shapeless-recipe definition
      * @see #shapeless(String, RecipeCategory, ItemStackTemplate)
      */
+    @NotNull
     public ShapelessCraftingRecipeRegistrable shapeless(
         @NotNull String path,
         RecipeCategory category,
@@ -161,6 +165,7 @@ public final class CraftingRecipeRegisterFactory
      * @return a new shapeless-recipe definition
      * @see #shapeless(String, RecipeCategory, ItemStack, int)
      */
+    @NotNull
     public ShapelessCraftingRecipeRegistrable shapeless(
         @NotNull String path,
         RecipeCategory category,
@@ -179,6 +184,7 @@ public final class CraftingRecipeRegisterFactory
      * @return a new shaped-recipe definition
      * @throws IllegalArgumentException if {@code count} is not positive
      */
+    @NotNull
     public ShapedCraftingRecipeRegistrable shaped(
         @NotNull String path,
         @NotNull RecipeCategory category,
@@ -200,6 +206,7 @@ public final class CraftingRecipeRegisterFactory
      * @return a new shaped-recipe definition
      * @see #shaped(String, RecipeCategory, ItemLike, int)
      */
+    @NotNull
     public ShapedCraftingRecipeRegistrable shaped(
         @NotNull String path,
         @NotNull RecipeCategory category,

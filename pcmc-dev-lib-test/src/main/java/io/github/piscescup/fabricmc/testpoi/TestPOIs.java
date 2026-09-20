@@ -16,7 +16,7 @@ import static io.github.piscescup.fabricmc.Refs.MOD_LOGGER;
 public final class TestPOIs {
     private static final POIRegisterFactory POIS = POIRegisterFactory.ofNamespace(MOD_ID);
 
-    public static final ResourceKey<PoiType> TEST_POI_KEY1 = POIS.path("test_poi1")
+    public static final ResourceKey<PoiType> TEST_POI_ON_ACACIA_FENCE_GATE = POIS.path("test_poi1")
         .matchingStatesFrom(Blocks.ACACIA_FENCE_GATE)
         .maxTickets(12)
         .validRange(12)

@@ -90,6 +90,8 @@ public final class ItemRegisterFactory extends RegisterFactoryImpl<Item> {
      * @throws NullPointerException if {@code path} is {@code null}
      * @see #path(String, Function)
      */
+    @Contract("_ -> new")
+    @NotNull
     public ItemPreRegistrable<Item> path(@NotNull String path) {
         NullCheck.requireNonNull(path, "path");
         Identifier id = Identifier.fromNamespaceAndPath(namespace, path);
@@ -108,6 +110,8 @@ public final class ItemRegisterFactory extends RegisterFactoryImpl<Item> {
      * @return a new pre-registration stage for the concrete item type
      * @throws NullPointerException if {@code path} or {@code factory} is {@code null}
      */
+    @Contract("_, _ -> new")
+    @NotNull
     public <I extends Item> ItemPreRegistrable<I> path(@NotNull String path, @NotNull Function<Item.Properties, I> factory) {
         NullCheck.requireNonNull(path, "path");
         Identifier id = Identifier.fromNamespaceAndPath(namespace, path);

@@ -1,6 +1,7 @@
 package io.github.piscescup.fabricmc.datagen.lang;
 
 import io.github.piscescup.fabricmc.constants.MCLanguage;
+import io.github.piscescup.fabricmc.datagen.DataGeneratorCollectors;
 import io.github.piscescup.fabricmc.store.lang.LangTranslations;
 import io.github.piscescup.util.validation.NullCheck;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
@@ -30,9 +31,10 @@ import java.util.concurrent.CompletableFuture;
  * @author REN YuanTong
  * @since 1.0.0
  * @see LangTranslations
- * @see io.github.piscescup.fabricmc.datagen.DatagenCollectors
+ * @see DataGeneratorCollectors
  */
-public class LanguageProvider extends FabricLanguageProvider {
+public class LanguageGenerator
+    extends FabricLanguageProvider {
     /**
      * The {@link LangTranslations} supplied at construction time and retained as-is.
      * Its map is read during {@link #generateTranslations(HolderLookup.Provider, TranslationBuilder)};
@@ -41,7 +43,7 @@ public class LanguageProvider extends FabricLanguageProvider {
     private final LangTranslations translations;
 
     /**
-     * Creates a {@link LanguageProvider} backed by the supplied {@link LangTranslations}.
+     * Creates a {@link LanguageGenerator} backed by the supplied {@link LangTranslations}.
      *
      * <p>The translation set is retained directly rather than copied. Its
      * entries must correspond to the selected language.</p>
@@ -52,7 +54,7 @@ public class LanguageProvider extends FabricLanguageProvider {
      * @param translations   the {@link LangTranslations} read during generation; must not be {@code null}
      * @throws NullPointerException if {@code language} or {@code translations} is {@code null}
      */
-    public LanguageProvider(
+    public LanguageGenerator(
         FabricPackOutput packOutput,
         CompletableFuture<HolderLookup.Provider> registryLookup,
         MCLanguage language,

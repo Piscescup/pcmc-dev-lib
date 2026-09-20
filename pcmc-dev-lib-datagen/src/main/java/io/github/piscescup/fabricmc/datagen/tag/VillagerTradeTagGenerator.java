@@ -22,7 +22,7 @@ import java.util.concurrent.CompletableFuture;
  * @author REN YuanTong
  * @since
  */
-public class VillagerTradeGenerator
+public class VillagerTradeTagGenerator
     extends FabricTagsProvider<VillagerTrade>
 {
     private final ReadableVillagerTradesHolder holder;
@@ -36,7 +36,7 @@ public class VillagerTradeGenerator
      * @param registryKey
      * @param registryLookupFuture the backing registry for the tag type
      */
-    public VillagerTradeGenerator(
+    public VillagerTradeTagGenerator(
         FabricPackOutput output,
         CompletableFuture<HolderLookup.Provider> registryLookupFuture,
         ReadableVillagerTradesHolder holder

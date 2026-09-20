@@ -58,9 +58,12 @@ public final class LevelTradesBuilder
     ) {
         NullCheck.requireNonNull(path, "path");
 
-        VillagerTrade previous = tradeMap.put(path, trade);
+        VillagerTrade previous = this.tradeMap.putIfAbsent(
+            path,
+            trade
+        );
 
-        StateCheck.checkState(previous != null, "The trade for villager %s is repeated", trade);
+        StateCheck.checkState(previous == null, "The trade for villager %s is repeated", trade);
         return this;
     }
 

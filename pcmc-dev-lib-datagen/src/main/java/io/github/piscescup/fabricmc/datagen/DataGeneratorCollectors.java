@@ -5,7 +5,10 @@ import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.datagen.lang.LanguageProvider;
 import io.github.piscescup.fabricmc.datagen.recipe.RecipesGenerator;
 import io.github.piscescup.fabricmc.datagen.tag.TagProvider;
-import io.github.piscescup.fabricmc.datagen.tag.VillagerTradeGenerator;
+import io.github.piscescup.fabricmc.datagen.tag.VillagerTradeTagGenerator;
+import io.github.piscescup.fabricmc.datagen.trade.TradeSetRegistryGenerator;
+import io.github.piscescup.fabricmc.datagen.trade.VillagerTradeDatagenModel;
+import io.github.piscescup.fabricmc.datagen.trade.VillagerTradeRegistryGenerator;
 import io.github.piscescup.fabricmc.store.lang.ReadableTranslationsHolder;
 import io.github.piscescup.fabricmc.store.recipe.ReadableRecipeRegistrablesHolder;
 import io.github.piscescup.fabricmc.store.tag.ReadableTagKeysHolder;
@@ -14,6 +17,7 @@ import io.github.piscescup.interfaces.Builder;
 import io.github.piscescup.util.validation.NullCheck;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.Contract;
@@ -21,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Configures language, tag, and recipe data providers for a Fabric data pack.
@@ -99,6 +104,13 @@ public final class DatagenCollectors {
      * The current public configuration methods do not populate this queue.
      */
     private final List<DataProvider.Factory<? extends DataProvider>> factories = new ArrayList<>();
+
+    /**
+     * Dynamic-registry bootstrap operations passed to
+     * DataGeneratorEntrypoint#buildRegistry.
+     */
+    private final List<Consumer<RegistrySetBuilder>> registryConfigurations =
+        new ArrayList<>();
 
     /**
      * Creates an unconfigured collector with empty provider queues.
@@ -187,10 +199,43 @@ public final class DatagenCollectors {
     }
 
     public DatagenCollectors villagerTradesProvider() {
-        registryDependentFactories.add(
-            (packOutput, lookupProvider) ->
-                new VillagerTradeGenerator(packOutput, lookupProvider, this.villagerTradesHolder)
+        VillagerTradeDatagenModel model =
+            VillagerTradeDatagenModel.create(villagerTradesHolder);
+
+        this.registryConfigurations.add(
+            model::registerBootstraps
         );
+
+        // data/<namespace>/villager_trade/*.json
+        this.registryDependentFactories.add(
+            (packOutput, lookupProvider) ->
+                new VillagerTradeRegistryGenerator(
+                    packOutput,
+                    lookupProvider,
+                    model
+                )
+        );
+
+        // data/<namespace>/trade_set/*.json
+        this.registryDependentFactories.add(
+            (packOutput, lookupProvider) ->
+                new TradeSetRegistryGenerator(
+                    packOutput,
+                    lookupProvider,
+                    model
+                )
+        );
+
+        // data/<namespace>/tags/villager_trade/*.json
+        this.registryDependentFactories.add(
+            (packOutput, lookupProvider) ->
+                new VillagerTradeTagGenerator(
+                    packOutput,
+                    lookupProvider,
+                    villagerTradesHolder
+                )
+        );
+
         return this;
     }
 
@@ -207,10 +252,15 @@ public final class DatagenCollectors {
      *         queued provider factory is invoked while its required holder is {@code null}
      */
     public void generate(@NotNull FabricDataGenerator.Pack pack) {
-
+        NullCheck.requireNonNull(pack, "pack");
         registryDependentFactories.forEach(pack::addProvider);
         factories.forEach(pack::addProvider);
 
+    }
+
+    public void buildRegistry(@NotNull RegistrySetBuilder registryBuilder) {
+        NullCheck.requireNonNull(registryBuilder, "registryBuilder");
+        this.registryConfigurations.forEach(c -> c.accept(registryBuilder));
     }
 
     /**
@@ -288,10 +338,11 @@ public final class DatagenCollectors {
             return this;
         }
 
-        public DataProviderConfiguration villagerTradesProvider(ReadableVillagerTradesHolder tradesHolder) {
+        public DataProviderConfiguration villagerTradesHolder(ReadableVillagerTradesHolder tradesHolder) {
             this.collectors.villagerTradesHolder = tradesHolder;
             return this;
         }
+
 
         /**
          * Validates all holder selections and returns the configured collector.
@@ -319,14 +370,13 @@ public final class DatagenCollectors {
                     "recipeHolder"
                 );
 
-            if  (this.collectors.villagerTradesHolder == null)
+            if (this.collectors.villagerTradesHolder == null)
                 throw IllegalBuilderPatternConfigurationException.missing(
                     "villagerTradesHolder"
                 );
 
             return this.collectors;
         }
-
 
     }
 }

@@ -98,6 +98,7 @@ public abstract class Register<
             id,
             MutableTranslationsHolder.INSTANCE
         );
+        this.registry = registry;
     }
 
     protected Register(

@@ -27,7 +27,8 @@ public final class POIRegisterFactory
         return new POIRegisterFactory(namespace);
     }
 
-    public POIPreRegistrable.MatchingStates path(@NotNull String path) {
+    @Contract("_ -> new")
+    public POIPreRegistrable.@NotNull MatchingStates path(@NotNull String path) {
         NullCheck.requireNonNull(path, "path");
         return new POIRegister(Identifier.fromNamespaceAndPath(this.namespace, path));
     }

@@ -1,0 +1,4 @@
+// 26.2	-999999999-01-01T00:00:00	PCMC Develop Lib Test/Villager Trade Sets
+db575ae873db9a7590bf74bea1eca976d0bdc75d data/pcmc-dev-lib-test/trade_set/test_trader/level_1.json
+183f507813fccdddc99cdc74111894fba608fa59 data/pcmc-dev-lib-test/trade_set/test_trader/level_2.json
+f8338aee22d5ba15d81053e71c48b261e1470495 data/pcmc-dev-lib-test/trade_set/test_trader/level_5.json

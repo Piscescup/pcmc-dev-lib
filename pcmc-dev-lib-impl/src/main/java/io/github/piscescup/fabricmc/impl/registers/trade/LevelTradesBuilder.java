@@ -3,6 +3,8 @@ package io.github.piscescup.fabricmc.impl.registers.trade;
 import io.github.piscescup.fabricmc.api.trade.VillagerLevelTradeBuilder;
 import io.github.piscescup.fabricmc.api.trade.VillagerLevelTradeMetadata;
 import io.github.piscescup.fabricmc.store.villager.trade.TradeLevel;
+import io.github.piscescup.util.validation.NullCheck;
+import io.github.piscescup.util.validation.StateCheck;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -20,67 +22,32 @@ import java.util.*;
  * @author REN YuanTong
  * @since
  */
-final class LevelTradesBuilder
+public final class LevelTradesBuilder
     implements VillagerLevelTradeBuilder
 {
-    private final String namespace;
-    private final Identifier professionId;
     private final TradeLevel level;
 
-    private final TagKey<VillagerTrade> tradeTag;
-    private final ResourceKey<TradeSet> tradeSetKey;
+    private final Map<String, VillagerTrade> tradeMap = new TreeMap<>();
 
-    private final Map<ResourceKey<VillagerTrade>, VillagerTrade>
-        declaredTrades = new LinkedHashMap<>();
+    private final Map<ResourceKey<VillagerTrade>, VillagerTrade> declaredTrades =
+        new LinkedHashMap<>();
 
-    private final Set<ResourceKey<VillagerTrade>>
-        includedTrades = new LinkedHashSet<>();
+    private final Set<ResourceKey<VillagerTrade>> includedTrades =
+        new LinkedHashSet<>();
 
-    private final Set<TagKey<VillagerTrade>>
-        includedTags = new LinkedHashSet<>();
+    private final Set<TagKey<VillagerTrade>> includedTags =
+        new LinkedHashSet<>();
 
     private NumberProvider amount = ConstantValue.exactly(2.0F);
     private boolean allowDuplicates;
-    private Optional<Identifier> randomSequence;
+    private Optional<Identifier> randomSequence = Optional.empty();
 
-    LevelTradesBuilder(
-        @NotNull String namespace,
-        @NotNull Identifier professionId,
+    public LevelTradesBuilder(
         @NotNull TradeLevel level
     ) {
-        this.namespace = Objects.requireNonNull(
-            namespace,
-            "namespace"
-        );
-        this.professionId = Objects.requireNonNull(
-            professionId,
-            "professionId"
-        );
-        this.level = Objects.requireNonNull(
+        this.level = NullCheck.requireNonNull(
             level,
             "level"
-        );
-
-        Identifier levelId = Identifier.fromNamespaceAndPath(
-            professionId.getNamespace(),
-            professionId.getPath() + "/level_" + level.level()
-        );
-
-        this.tradeTag = TagKey.create(
-            Registries.VILLAGER_TRADE,
-            levelId
-        );
-
-        this.tradeSetKey = ResourceKey.create(
-            Registries.TRADE_SET,
-            levelId
-        );
-
-        this.randomSequence = Optional.of(
-            Identifier.fromNamespaceAndPath(
-                levelId.getNamespace(),
-                "trade_set/" + levelId.getPath()
-            )
         );
     }
 
@@ -89,61 +56,14 @@ final class LevelTradesBuilder
         @NotNull String path,
         @NotNull VillagerTrade trade
     ) {
-        Objects.requireNonNull(path, "path");
+        NullCheck.requireNonNull(path, "path");
 
-        Identifier id = Identifier.fromNamespaceAndPath(
-            namespace,
-            professionId.getPath()
-            + "/"
-            + level.level()
-            + "/"
-            + path
-        );
-
-        return add(id, trade);
-    }
-
-    @Override
-    public @NotNull VillagerLevelTradeBuilder add(
-        @NotNull Identifier id,
-        @NotNull VillagerTrade trade
-    ) {
-        Objects.requireNonNull(id, "id");
-
-        ResourceKey<VillagerTrade> key = ResourceKey.create(
-            Registries.VILLAGER_TRADE,
-            id
-        );
-
-        return add(key, trade);
-    }
-
-    @Override
-    public @NotNull VillagerLevelTradeBuilder add(
-        @NotNull ResourceKey<VillagerTrade> key,
-        @NotNull VillagerTrade trade
-    ) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(trade, "trade");
-
-        VillagerTrade previous = declaredTrades.putIfAbsent(
-            key,
+        VillagerTrade previous = this.tradeMap.putIfAbsent(
+            path,
             trade
         );
 
-        if (previous != null && previous != trade) {
-            throw new IllegalStateException(
-                "Duplicate villager trade id: "
-                + key.identifier()
-            );
-        }
-
-        /*
-         * If the same key was previously included as an external trade,
-         * the locally declared value takes precedence.
-         */
-        includedTrades.remove(key);
-
+        StateCheck.checkState(previous == null, "The trade for villager %s is repeated", trade);
         return this;
     }
 
@@ -151,7 +71,7 @@ final class LevelTradesBuilder
     public @NotNull VillagerLevelTradeBuilder include(
         @NotNull ResourceKey<VillagerTrade> trade
     ) {
-        Objects.requireNonNull(trade, "trade");
+        NullCheck.requireNonNull(trade, "trade");
 
         if (!declaredTrades.containsKey(trade)) {
             includedTrades.add(trade);
@@ -164,14 +84,7 @@ final class LevelTradesBuilder
     public @NotNull VillagerLevelTradeBuilder includeTag(
         @NotNull TagKey<VillagerTrade> tag
     ) {
-        Objects.requireNonNull(tag, "tag");
-
-        if (tradeTag.equals(tag)) {
-            throw new IllegalArgumentException(
-                "A villager trade tag cannot include itself: "
-                + tag.location()
-            );
-        }
+        NullCheck.requireNonNull(tag, "tag");
 
         includedTags.add(tag);
         return this;
@@ -181,7 +94,7 @@ final class LevelTradesBuilder
     public @NotNull VillagerLevelTradeBuilder amount(
         @NotNull NumberProvider amount
     ) {
-        this.amount = Objects.requireNonNull(
+        this.amount = NullCheck.requireNonNull(
             amount,
             "amount"
         );
@@ -202,7 +115,7 @@ final class LevelTradesBuilder
         @NotNull Identifier randomSequence
     ) {
         this.randomSequence = Optional.of(
-            Objects.requireNonNull(
+            NullCheck.requireNonNull(
                 randomSequence,
                 "randomSequence"
             )
@@ -212,7 +125,35 @@ final class LevelTradesBuilder
     }
 
     @NotNull
-    VillagerLevelTradeMetadata build() {
+    public VillagerLevelTradeMetadata buildBy(Identifier professionId) {
+
+        Identifier levelId = professionId.withSuffix("/level_" + level.level());
+
+        TagKey<VillagerTrade> tradeTag = TagKey.create(
+            Registries.VILLAGER_TRADE,
+            levelId
+        );
+
+        tradeMap.forEach((path, trade) -> {
+            ResourceKey<VillagerTrade> villagerTradeResourceKey = ResourceKey.create(
+                Registries.VILLAGER_TRADE,
+                professionId.withSuffix(Integer.toString(level.level()))
+                    .withSuffix("/" + path)
+            );
+
+            declaredTrades.put(villagerTradeResourceKey, trade);
+        });
+
+        ResourceKey<TradeSet> tradeSetKey = ResourceKey.create(
+            Registries.TRADE_SET,
+            levelId
+        );
+
+        Optional<Identifier> effectiveRandomSequence =
+            randomSequence.isPresent()
+                ? randomSequence
+                : Optional.of(levelId.withPrefix("trade_set/"));
+
         return new VillagerLevelTradeMetadata(
             level,
             tradeTag,

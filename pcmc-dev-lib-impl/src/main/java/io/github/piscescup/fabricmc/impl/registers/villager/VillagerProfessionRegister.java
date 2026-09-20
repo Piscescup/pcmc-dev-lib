@@ -1,11 +1,18 @@
 package io.github.piscescup.fabricmc.impl.registers.villager;
 
 import com.google.common.collect.ImmutableSet;
+import io.github.piscescup.fabricmc.api.trade.VillagerLevelTradeBuilder;
+import io.github.piscescup.fabricmc.api.trade.VillagerLevelTradeMetadata;
+import io.github.piscescup.fabricmc.api.trade.VillagerProfessionTradesPostRegistrable;
 import io.github.piscescup.fabricmc.api.villager.VillagerProfessionPostRegistrable;
 import io.github.piscescup.fabricmc.api.villager.VillagerProfessionPreRegistrable;
 import io.github.piscescup.fabricmc.impl.registers.Register;
+import io.github.piscescup.fabricmc.impl.registers.trade.LevelTradesBuilder;
+import io.github.piscescup.fabricmc.impl.store.village.trade.MutableVillagerTradeHolder;
+import io.github.piscescup.fabricmc.store.villager.trade.TradeLevel;
 import io.github.piscescup.util.validation.NullCheck;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -22,6 +29,8 @@ import net.minecraft.world.level.block.Block;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.EnumMap;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -33,13 +42,13 @@ public final class VillagerProfessionRegister
     extends Register<VillagerProfession, VillagerProfession, VillagerProfessionPreRegistrable, VillagerProfessionPostRegistrable>
     implements VillagerProfessionPreRegistrable.HeldJobSite, VillagerProfessionPreRegistrable, VillagerProfessionPostRegistrable
 {
-    private Component name;
     private Predicate<Holder<PoiType>> heldJobSite;
     private Predicate<Holder<PoiType>> acquirableJobSite;
-    private ImmutableSet<Item> requestedItems;
-    private ImmutableSet<Block> secondaryPoi;
+    private ImmutableSet<Item> requestedItems = ImmutableSet.of();
+    private ImmutableSet<Block> secondaryPoi = ImmutableSet.of();
     private @Nullable SoundEvent workSound;
-    private Int2ObjectMap<ResourceKey<TradeSet>> tradeSetsByLevel;
+    private Int2ObjectMap<ResourceKey<TradeSet>> tradeSetsByLevel = new Int2ObjectOpenHashMap<>();
+    private EnumMap<TradeLevel, VillagerLevelTradeMetadata> levelTrades = new EnumMap<>(TradeLevel.class);
 
     VillagerProfessionRegister(Identifier id) {
         super(Registries.VILLAGER_PROFESSION, id);
@@ -87,8 +96,23 @@ public final class VillagerProfessionRegister
     }
 
     @Override
-    public VillagerProfessionPreRegistrable tradeSetsByLevel(Int2ObjectMap<ResourceKey<TradeSet>> tradeSetsByLevel) {
-        this.tradeSetsByLevel = tradeSetsByLevel;
+    public VillagerProfessionPreRegistrable tradeSetsByLevel(VillagerProfessionTradesPostRegistrable tradesPostRegistrable) {
+        EnumMap<TradeLevel, Consumer<VillagerLevelTradeBuilder>> trades = tradesPostRegistrable.trades();
+
+        trades.forEach((tradeLevel, builderConsumer) -> {
+            LevelTradesBuilder builder = new LevelTradesBuilder(tradeLevel);
+            builderConsumer.accept(builder);
+
+            VillagerLevelTradeMetadata metadata =
+                builder.buildBy(this.id);
+
+            levelTrades.put(tradeLevel, metadata);
+            tradeSetsByLevel.put(
+                tradeLevel.level(),
+                metadata.tradeSetKey()
+            );
+        });
+
         return this;
     }
 
@@ -107,6 +131,9 @@ public final class VillagerProfessionRegister
                 tradeSetsByLevel
             )
         );
+
+        MutableVillagerTradeHolder.INSTANCE.addAll(this.resourceKey, this.levelTrades);
+
         return this;
     }
 

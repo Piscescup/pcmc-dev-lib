@@ -72,6 +72,8 @@ public final class CreativeModeTabRegisterFactory
      * @return a new pre-registration stage for configuring the tab
      * @throws NullPointerException if {@code path} is {@code null}
      */
+    @Contract("_ -> new")
+    @NotNull
     public CreativeModeTabPreRegistrable path(@NotNull String path) {
         NullCheck.requireNonNull(path, "path");
         return new CreativeModeTabRegister(Identifier.fromNamespaceAndPath(namespace, path));

@@ -7,6 +7,8 @@ import io.github.piscescup.fabricmc.testpoi.TestPOIs;
 import io.github.piscescup.fabricmc.testrecipes.TestCraftingRecipes;
 import io.github.piscescup.fabricmc.testtags.TestBlockTags;
 import io.github.piscescup.fabricmc.testtags.TestItemTagKeys;
+import io.github.piscescup.fabricmc.testtags.TestPOITags;
+import io.github.piscescup.fabricmc.testvillager.TestVillagerProfessions;
 import net.fabricmc.api.ModInitializer;
 
 /**
@@ -23,9 +25,13 @@ public class TestMod implements ModInitializer {
 
         TestItemTagKeys.registerItemTags();
         TestBlockTags.registerBlockTags();
+        TestPOITags.registerPOITags();
 
         TestCraftingRecipes.registerRecipes();
 
         TestPOIs.registerPOIs();
+
+
+        TestVillagerProfessions.registerTestVillagerProfessions();
     }
 }

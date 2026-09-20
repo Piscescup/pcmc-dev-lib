@@ -3,6 +3,7 @@ package io.github.piscescup.fabricmc.impl.store.village.trade;
 import io.github.piscescup.fabricmc.api.trade.VillagerLevelTradeMetadata;
 import io.github.piscescup.fabricmc.store.villager.trade.ReadableVillagerTradesHolder;
 import io.github.piscescup.fabricmc.store.villager.trade.TradeLevel;
+import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import org.jetbrains.annotations.NotNull;
@@ -33,8 +34,8 @@ public enum MutableVillagerTradeHolder
         @NotNull ResourceKey<VillagerProfession> profession,
         @NotNull VillagerLevelTradeMetadata metadata
     ) {
-        Objects.requireNonNull(profession, "profession");
-        Objects.requireNonNull(metadata, "metadata");
+        NullCheck.requireNonNull(profession, "profession");
+        NullCheck.requireNonNull(metadata, "metadata");
 
         EnumMap<TradeLevel, VillagerLevelTradeMetadata> levels =
             professions.computeIfAbsent(
@@ -56,6 +57,16 @@ public enum MutableVillagerTradeHolder
                 + metadata.level()
             );
         }
+    }
+
+    public void addAll(
+        @NotNull ResourceKey<VillagerProfession> profession,
+        @NotNull EnumMap<TradeLevel, VillagerLevelTradeMetadata> levelTrades
+    ) {
+        Objects.requireNonNull(profession, "profession");
+        Objects.requireNonNull(levelTrades, "metadata");
+
+        this.professions.put(profession, levelTrades);
     }
 
     @Override

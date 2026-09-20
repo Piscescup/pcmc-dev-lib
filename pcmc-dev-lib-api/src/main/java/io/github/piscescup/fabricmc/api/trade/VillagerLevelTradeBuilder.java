@@ -18,16 +18,6 @@ public interface VillagerLevelTradeBuilder {
         VillagerTrade trade
     );
 
-    VillagerLevelTradeBuilder add(
-        Identifier id,
-        VillagerTrade trade
-    );
-
-    VillagerLevelTradeBuilder add(
-        ResourceKey<VillagerTrade> key,
-        VillagerTrade trade
-    );
-
     VillagerLevelTradeBuilder include(
         ResourceKey<VillagerTrade> trade
     );

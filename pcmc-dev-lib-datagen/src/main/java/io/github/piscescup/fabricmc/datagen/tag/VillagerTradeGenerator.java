@@ -1,21 +1,20 @@
 package io.github.piscescup.fabricmc.datagen.tag;
 
+import io.github.piscescup.fabricmc.api.trade.VillagerLevelTradeMetadata;
 import io.github.piscescup.fabricmc.store.villager.trade.ReadableVillagerTradesHolder;
 import io.github.piscescup.fabricmc.store.villager.trade.TradeLevel;
-import io.github.piscescup.fabricmc.store.villager.trade.VillagerTrades;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.tags.TagAppender;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.item.trading.VillagerTrade;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -26,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
 public class VillagerTradeGenerator
     extends FabricTagsProvider<VillagerTrade>
 {
-    private final Map<ResourceKey<VillagerTrade>, VillagerTrades> trades;
+    private final ReadableVillagerTradesHolder holder;
 
     /**
      * Constructs a new {@link FabricTagsProvider} with the default computed path.
@@ -40,41 +39,39 @@ public class VillagerTradeGenerator
     public VillagerTradeGenerator(
         FabricPackOutput output,
         CompletableFuture<HolderLookup.Provider> registryLookupFuture,
-        ReadableVillagerTradesHolder tradesHolder
+        ReadableVillagerTradesHolder holder
     ) {
         super(
             output, Registries.VILLAGER_TRADE, registryLookupFuture
         );
-
-        trades = tradesHolder.all();
+        this.holder = holder;
     }
 
     @Override
     protected void addTags(HolderLookup.@NotNull Provider registries) {
         HolderLookup.RegistryLookup<VillagerTrade> tradeLookup = registries.lookupOrThrow(Registries.VILLAGER_TRADE);
-        for (var tradeEntry : this.trades.entrySet()) {
-            ResourceKey<VillagerTrade> tradeKey = tradeEntry.getKey();
+        Set<Map.Entry<ResourceKey<VillagerProfession>, Map<TradeLevel, VillagerLevelTradeMetadata>>> tradeEntries = holder.allTrades()
+            .entrySet();
 
-            Map<TradeLevel, Collection<ResourceKey<VillagerTrade>>> trades = tradeEntry.getValue().trades();
+        for (Map.Entry<ResourceKey<VillagerProfession>, Map<TradeLevel, VillagerLevelTradeMetadata>> tradeEntry : tradeEntries) {
+            Set<Map.Entry<TradeLevel, VillagerLevelTradeMetadata>> trades = tradeEntry.getValue()
+                .entrySet();
 
-            Identifier identifier = tradeKey.identifier();
-
-            String namespace = identifier.getNamespace();
-            String path = identifier.getPath();
-
-            for (var trade : trades.entrySet()) {
+            for(var trade : trades) {
                 TradeLevel level = trade.getKey();
-                Collection<ResourceKey<VillagerTrade>> tradesOnLevel = trade.getValue();
+                VillagerLevelTradeMetadata tradeMetadata = trade.getValue();
 
-                TagKey<VillagerTrade> tradeTag = TagKey.create(
-                    Registries.VILLAGER_TRADE,
-                    Identifier.fromNamespaceAndPath(namespace, path + "/level_" + level.level())
-                );
+                TagAppender<VillagerTrade> tagAppender = tag(tradeMetadata.tradeTag());
 
-                TagAppender<VillagerTrade> tagAppender = tag(tradeTag);
+                tradeMetadata.declaredTrades()
+                    .keySet()
+                    .forEach(tagAppender::add);
 
-                tagAppender.addAll(tradesOnLevel);
+                tradeMetadata.includedTrades()
+                    .forEach(tagAppender::add);
 
+                tradeMetadata.includedTags()
+                    .forEach(tagAppender::addTag);
             }
 
         }

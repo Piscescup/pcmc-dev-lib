@@ -1,14 +1,15 @@
 package io.github.piscescup.fabricmc.api.trade;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.trading.TradeSet;
+
+import io.github.piscescup.fabricmc.store.villager.trade.TradeLevel;
+
+import java.util.EnumMap;
+import java.util.function.Consumer;
 
 /**
  * @author REN YuanTong
  * @since 1.0.0
  */
 public interface VillagerProfessionTradesPostRegistrable {
-
-    Int2ObjectMap<ResourceKey<TradeSet>> tradeSetsByLevel();
+    EnumMap<TradeLevel, Consumer<VillagerLevelTradeBuilder>> trades();
 }

@@ -12,6 +12,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 /**
+ * Stores shared profession trade metadata for data generation.
+ *
+ * <p>{@link #add(ResourceKey, VillagerLevelTradeMetadata)} merges a single
+ * level and rejects conflicting metadata. {@link #addAll(ResourceKey, EnumMap)}
+ * replaces a profession's entire level map and retains the supplied map directly.
+ * Read operations return shared metadata values inside unmodifiable map snapshots.</p>
+ *
+ * <p>This singleton is unsynchronized. Finish registration and mutation before
+ * data-generation consumers traverse its declarations.</p>
  *
  * @author REN YuanTong
  * @since 1.0.0
@@ -19,14 +28,22 @@ import java.util.*;
 public enum MutableVillagerTradeHolder
     implements ReadableVillagerTradesHolder
 {
+    /** The shared holder populated by profession registration. */
     INSTANCE;
 
+    /** Professions in insertion order, each mapped to its career-level metadata. */
     private final Map<ResourceKey<VillagerProfession>, EnumMap<TradeLevel, VillagerLevelTradeMetadata>> professions =
         new LinkedHashMap<>();
 
     /**
      * Adds one profession-level metadata entry.
      *
+     * <p>Equal metadata already stored at this level is accepted without
+     * replacing the existing value.</p>
+     *
+     * @param profession the owning profession key; must not be {@code null}
+     * @param metadata the level metadata to add; must not be {@code null}
+     * @throws NullPointerException if {@code profession}, {@code metadata}, or its level is {@code null}
      * @throws IllegalStateException if different metadata has already been
      *                               declared for the same profession and level
      */
@@ -59,6 +76,16 @@ public enum MutableVillagerTradeHolder
         }
     }
 
+    /**
+     * Replaces all metadata for a profession with the supplied level map.
+     *
+     * <p>The map is retained directly without copying or checking individual
+     * entries. Subsequent mutations of that map are visible to this holder.</p>
+     *
+     * @param profession the owning profession key; must not be {@code null}
+     * @param levelTrades the replacement level map; must not be {@code null}
+     * @throws NullPointerException if either argument is {@code null}
+     */
     public void addAll(
         @NotNull ResourceKey<VillagerProfession> profession,
         @NotNull EnumMap<TradeLevel, VillagerLevelTradeMetadata> levelTrades
@@ -69,6 +96,7 @@ public enum MutableVillagerTradeHolder
         this.professions.put(profession, levelTrades);
     }
 
+    /** {@inheritDoc} */
     @Override
     public @Nullable VillagerLevelTradeMetadata searchByLevel(
         @NotNull ResourceKey<VillagerProfession> profession,
@@ -85,6 +113,7 @@ public enum MutableVillagerTradeHolder
             : levels.get(level);
     }
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Map<TradeLevel, VillagerLevelTradeMetadata> tradesOf(
         @NotNull ResourceKey<VillagerProfession> profession
@@ -103,6 +132,7 @@ public enum MutableVillagerTradeHolder
         );
     }
 
+    /** {@inheritDoc} */
     @Override
     public @NotNull Map<ResourceKey<VillagerProfession>, Map<TradeLevel, VillagerLevelTradeMetadata>> allTrades() {
         Map<ResourceKey<VillagerProfession>, Map<TradeLevel, VillagerLevelTradeMetadata>> result = new LinkedHashMap<>();

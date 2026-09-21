@@ -86,7 +86,6 @@ public abstract class Register<
      *
      * @param registry           the target {@link Registry}; must not be {@code null}
      * @param id                 the namespaced {@link Identifier}; must not be {@code null}
-     * @param translationsHolder the holder receiving this entry's translations; must not be {@code null}
      * @throws NullPointerException if any argument is {@code null}
      */
     protected Register(

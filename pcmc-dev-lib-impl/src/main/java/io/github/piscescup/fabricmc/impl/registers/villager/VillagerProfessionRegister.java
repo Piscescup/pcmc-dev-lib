@@ -34,31 +34,61 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
+ * Implements the configuration and registration stages for a villager profession.
+ *
+ * <p>Created through {@link VillagerProfessionRegisterFactory}. Job-site
+ * predicates, item and block sets, work sound, and trade-set keys are passed to
+ * the profession constructor during {@link #register()}. Trade callbacks are
+ * evaluated earlier, by {@link #tradeSetsByLevel(VillagerProfessionTradesPostRegistrable)}.</p>
+ *
+ * <p>Registration also places the level metadata in
+ * {@link MutableVillagerTradeHolder#INSTANCE} for data generation. Complete
+ * configuration before registering this stateful builder once.</p>
  *
  * @author REN YuanTong
- * @since
+ * @since 1.0.0
+ * @see VillagerProfessionPreRegistrable
+ * @see VillagerProfessionPostRegistrable
  */
 public final class VillagerProfessionRegister
     extends Register<VillagerProfession, VillagerProfession, VillagerProfessionPreRegistrable, VillagerProfessionPostRegistrable>
     implements VillagerProfessionPreRegistrable.HeldJobSite, VillagerProfessionPreRegistrable, VillagerProfessionPostRegistrable
 {
+    /** Required predicate selected through the factory's first stage. */
     private Predicate<Holder<PoiType>> heldJobSite;
+    /** Acquisition predicate, initially assigned together with the held-site predicate. */
     private Predicate<Holder<PoiType>> acquirableJobSite;
+    /** Requested items; defaults to an empty immutable set. */
     private ImmutableSet<Item> requestedItems = ImmutableSet.of();
+    /** Secondary POI blocks; defaults to an empty immutable set. */
     private ImmutableSet<Block> secondaryPoi = ImmutableSet.of();
+    /** Optional work sound; initially unset. */
     private @Nullable SoundEvent workSound;
+    /** Generated trade-set keys indexed by numeric career level. */
     private Int2ObjectMap<ResourceKey<TradeSet>> tradeSetsByLevel = new Int2ObjectOpenHashMap<>();
+    /** Metadata built for configured levels and shared with the holder at registration. */
     private EnumMap<TradeLevel, VillagerLevelTradeMetadata> levelTrades = new EnumMap<>(TradeLevel.class);
 
+    /**
+     * Creates a profession builder with empty trade and item configuration.
+     *
+     * @param id the profession identifier
+     */
     VillagerProfessionRegister(Identifier id) {
         super(Registries.VILLAGER_PROFESSION, id);
     }
 
+    /**
+     * Returns the translation key derived from this profession's identifier.
+     *
+     * @return {@code entity.<namespace>.villager.<path>}
+     */
     @Override
     protected String translateKey() {
         return "entity." + id.getNamespace() + ".villager." + id.getPath();
     }
 
+    /** {@inheritDoc} */
     @Override
     public VillagerProfessionPreRegistrable heldJobSite(Predicate<Holder<PoiType>> heldJobSite) {
         NullCheck.requireNonNull(heldJobSite, "heldJobSite");
@@ -68,6 +98,7 @@ public final class VillagerProfessionRegister
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public VillagerProfessionPreRegistrable acquirableJobSite(Predicate<Holder<PoiType>> acquirableJobSite) {
         NullCheck.requireNonNull(acquirableJobSite, "acquirableJobSite");
@@ -75,6 +106,7 @@ public final class VillagerProfessionRegister
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public VillagerProfessionPreRegistrable requestedItems(ImmutableSet<Item> requestedItems) {
         NullCheck.requireAllNonNull(requestedItems);
@@ -82,6 +114,7 @@ public final class VillagerProfessionRegister
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public VillagerProfessionPreRegistrable secondaryPoi(ImmutableSet<Block> secondaryPoi) {
         NullCheck.requireAllNonNull(secondaryPoi);
@@ -89,12 +122,14 @@ public final class VillagerProfessionRegister
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public VillagerProfessionPreRegistrable workSound(@Nullable SoundEvent workSound) {
         this.workSound = workSound;
         return this;
     }
 
+    /** {@inheritDoc} */
     @Override
     public VillagerProfessionPreRegistrable tradeSetsByLevel(VillagerProfessionTradesPostRegistrable tradesPostRegistrable) {
         EnumMap<TradeLevel, Consumer<VillagerLevelTradeBuilder>> trades = tradesPostRegistrable.trades();
@@ -116,6 +151,17 @@ public final class VillagerProfessionRegister
         return this;
     }
 
+    /**
+     * Constructs the profession, registers it, and collects its trade metadata.
+     *
+     * <p>The profession is added to {@link BuiltInRegistries#VILLAGER_PROFESSION}
+     * before the level metadata map is passed to
+     * {@link MutableVillagerTradeHolder#addAll(ResourceKey, EnumMap)}. Trade
+     * entries, tags, and trade sets are emitted separately by data generation.
+     * Repeated registration calls are not guarded.</p>
+     *
+     * @return this instance as the profession post-registration stage
+     */
     @Override
     public @NonNull VillagerProfessionPostRegistrable register() {
         this.thingToBeRegistered = Registry.register(

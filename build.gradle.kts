@@ -118,6 +118,7 @@ dependencies {
 	include(project(":pcmc-dev-lib-api"))
 	include(project(":pcmc-dev-lib-impl"))
 	include(project(":pcmc-dev-lib-datagen"))
+	include(project(":pcmc-dev-lib-utils"))
 
 }
 
@@ -158,7 +159,11 @@ tasks.register("publishAllToMavenLocal") {
 	group = "publishing"
 	description = "Publishes all PCMC Dev Lib modules to Maven Local."
 
-	dependsOn(subprojects.map { "${it.path}:publishToMavenLocal" })
+	dependsOn(
+		subprojects
+			.filterNot { it.name == "pcmc-dev-lib-test" }
+			.map { "${it.path}:publishToMavenLocal" }
+	)
 }
 
 tasks.named<ProcessResources>("processResources") {

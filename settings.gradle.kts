@@ -22,5 +22,6 @@ include(
     "pcmc-dev-lib-api",
     "pcmc-dev-lib-impl",
     "pcmc-dev-lib-datagen",
-    "pcmc-dev-lib-utils"
+    "pcmc-dev-lib-utils",
+    "pcmc-dev-lib-test"
 )

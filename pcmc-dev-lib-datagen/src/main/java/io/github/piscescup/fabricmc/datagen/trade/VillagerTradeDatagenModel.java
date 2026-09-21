@@ -22,7 +22,7 @@ import java.util.Set;
  * references and are emitted as tag members by the trade tag provider.</p>
  *
  * <p>Register the model's bootstraps through {@link #registerBootstraps(RegistrySetBuilder)}
- * before the dynamic-registry providers resolve its keys. Complete profession
+ * before the dynamic-registry providers resolveSubPath its keys. Complete profession
  * registration before creating this model; later holder additions are absent
  * from its copied maps.</p>
  *

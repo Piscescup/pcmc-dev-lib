@@ -18,23 +18,29 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
+ * Generates the trade tags referenced by profession-level trade sets.
+ *
+ * <p>For each level, the provider adds declared trade keys, included trade
+ * keys, and nested tags as required members. The holder is retained and queried
+ * when tags are generated. Complete registration before creating the matching
+ * registry model so both providers use the same declarations.</p>
  *
  * @author REN YuanTong
- * @since
+ * @since 1.0.0
+ * @see VillagerLevelTradeMetadata
  */
 public class VillagerTradeTagGenerator
     extends FabricTagsProvider<VillagerTrade>
 {
+    /** Metadata source queried when Fabric invokes tag generation. */
     private final ReadableVillagerTradesHolder holder;
 
     /**
-     * Constructs a new {@link FabricTagsProvider} with the default computed path.
+     * Creates a tag provider targeting {@link Registries#VILLAGER_TRADE}.
      *
-     * <p>Common implementations of this class are provided.
-     *
-     * @param output               the {@link FabricPackOutput} instance
-     * @param registryKey
-     * @param registryLookupFuture the backing registry for the tag type
+     * @param output the Fabric pack output receiving generated tag files
+     * @param registryLookupFuture the future supplying the trade registry lookup
+     * @param holder the source of profession-level tag declarations
      */
     public VillagerTradeTagGenerator(
         FabricPackOutput output,
@@ -47,6 +53,11 @@ public class VillagerTradeTagGenerator
         this.holder = holder;
     }
 
+    /**
+     * Populates each declared level tag from its trade keys and nested tags.
+     *
+     * @param registries the registry lookup for this generation run
+     */
     @Override
     protected void addTags(HolderLookup.@NotNull Provider registries) {
         HolderLookup.RegistryLookup<VillagerTrade> tradeLookup = registries.lookupOrThrow(Registries.VILLAGER_TRADE);

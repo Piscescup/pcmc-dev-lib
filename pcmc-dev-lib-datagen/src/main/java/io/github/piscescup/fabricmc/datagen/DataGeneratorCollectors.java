@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Configures language, tag, and recipe data providers for a Fabric data pack.
+ * Configures language, tag, recipe, and villager trade providers for a Fabric data pack.
  *
  * <p>Start with {@link #configuration()}, supply the readable translation,
- * tag, and recipe holders, and call {@link DataProviderConfiguration#build()}.
- * Then select languages, registries, and recipe generation before attaching
+ * tag, recipe, and villager trade holders, and call {@link DataProviderConfiguration#build()}.
+ * Then select the desired data providers before attaching
  * the providers to a {@link FabricDataGenerator} through
  * {@link #generate(FabricDataGenerator.Pack)}.</p>
  *
@@ -40,10 +40,11 @@ import java.util.function.Consumer;
  * <pre>{@code
  * FabricDataGenerator.Pack pack = generator.createPack();
  *
- * DatagenCollectors.configuration()
+ * DataGeneratorCollectors.configuration()
  *     .translationHolder(MutableTranslationsHolder.INSTANCE)
  *     .tagKeyHolder(MutableTagKeysHolder.INSTANCE)
  *     .recipeHolder(MutableReciperegistrablesHolder.INSTANCE)
+ *     .villagerTradesHolder(MutableVillagerTradeHolder.INSTANCE)
  *     .build()
  *     .langProvider(MCLanguage.EN_US)
  *     .tagProvider(Registries.ITEM)
@@ -59,12 +60,19 @@ import java.util.function.Consumer;
  * collector list obtained at construction, while the supplied recipe holder
  * exposes a live collection to its provider.</p>
  *
+ * <p>{@link #villagerTradesProvider()} also snapshots the current trade
+ * declarations and queues dynamic-registry bootstraps. Select it after profession
+ * registration, then call {@link #buildRegistry(RegistrySetBuilder)} from the
+ * data-generator entrypoint's registry-building hook and {@link #generate(FabricDataGenerator.Pack)}
+ * when attaching providers. Use the same collector instance for both hooks.</p>
+ *
  * @author REN YuanTong
  * @since 1.0.0
  * @see DataProviderConfiguration
  * @see LanguageGenerator
  * @see TagGenerator
  * @see RecipesGenerator
+ * @see VillagerTradeDatagenModel
  */
 public final class DataGeneratorCollectors {
     /**
@@ -89,13 +97,19 @@ public final class DataGeneratorCollectors {
      */
     private ReadableRecipeRegistrablesHolder recipesHolder;
 
+    /**
+     * Trade metadata source, initially {@code null}. Registry declarations are
+     * captured by {@link #villagerTradesProvider()}, while the tag provider
+     * reads this holder during generation.
+     */
     private ReadableVillagerTradesHolder villagerTradesHolder;
 
     /**
      * Ordered {@link FabricDataGenerator.Pack.RegistryDependentFactory} queue.
      * Initially empty; {@link #langProvider(MCLanguage)},
-     * {@link #tagProvider(ResourceKey)}, and {@link #recipesProvider()} append
-     * factories for {@link #generate(FabricDataGenerator.Pack)}.
+     * {@link #tagProvider(ResourceKey)}, {@link #recipesProvider()}, and
+     * {@link #villagerTradesProvider()} append factories for
+     * {@link #generate(FabricDataGenerator.Pack)}.
      */
     private final List<FabricDataGenerator.Pack.RegistryDependentFactory<? extends DataProvider>> registryDependentFactories = new ArrayList<>();
 
@@ -106,8 +120,8 @@ public final class DataGeneratorCollectors {
     private final List<DataProvider.Factory<? extends DataProvider>> factories = new ArrayList<>();
 
     /**
-     * Dynamic-registry bootstrap operations passed to
-     * DataGeneratorEntrypoint#buildRegistry.
+     * Dynamic-registry bootstraps queued by {@link #villagerTradesProvider()}
+     * and applied through {@link #buildRegistry(RegistrySetBuilder)}.
      */
     private final List<Consumer<RegistrySetBuilder>> registryConfigurations =
         new ArrayList<>();
@@ -115,9 +129,9 @@ public final class DataGeneratorCollectors {
     /**
      * Creates an unconfigured collector with empty provider queues.
      *
-     * <p>All three holder references are initially {@code null}. Use
+     * <p>All four holder references are initially {@code null}. Use
      * {@link #configuration()} to select and validate the holders before
-     * attaching language, tag, or recipe providers to a {@link FabricDataGenerator}.</p>
+     * attaching providers to a {@link FabricDataGenerator}.</p>
      *
      * @see #configuration()
      */
@@ -127,7 +141,7 @@ public final class DataGeneratorCollectors {
     /**
      * Starts a new configuration with independent provider queues.
      *
-     * @return a new configuration for selecting the translation, tag, and recipe holders
+     * @return a new configuration for selecting the translation, tag, recipe, and trade holders
      */
     @Contract(" -> new")
     @NotNull
@@ -198,6 +212,23 @@ public final class DataGeneratorCollectors {
         return this;
     }
 
+    /**
+     * Queues generation of villager trades, trade sets, and their level tags.
+     *
+     * <p>This call immediately snapshots the holder into a
+     * {@link VillagerTradeDatagenModel} and queues its registry bootstraps. Call
+     * it once after profession registration has populated the holder. Apply the
+     * bootstraps through {@link #buildRegistry(RegistrySetBuilder)} and attach
+     * the three providers through {@link #generate(FabricDataGenerator.Pack)}.</p>
+     *
+     * <p>The tag provider consults the holder later, so finish all trade
+     * declarations before this call to keep registry and tag output consistent.</p>
+     *
+     * @return this collector for fluent provider selection
+     * @throws NullPointerException if the villager trade holder is unset
+     * @throws IllegalStateException if the holder declares duplicate trade or trade-set keys
+     * @see DataProviderConfiguration#villagerTradesHolder(ReadableVillagerTradesHolder)
+     */
     public DataGeneratorCollectors villagerTradesProvider() {
         VillagerTradeDatagenModel model =
             VillagerTradeDatagenModel.create(villagerTradesHolder);
@@ -258,6 +289,16 @@ public final class DataGeneratorCollectors {
 
     }
 
+    /**
+     * Adds the queued dynamic-registry bootstraps to Fabric's registry builder.
+     *
+     * <p>Invoke this method from the data-generator entrypoint's registry-building
+     * hook after selecting {@link #villagerTradesProvider()}. The queue is
+     * retained, so each call applies all configured bootstraps again.</p>
+     *
+     * @param registryBuilder the registry builder receiving the queued bootstraps
+     * @throws NullPointerException if {@code registryBuilder} is {@code null}
+     */
     public void buildRegistry(@NotNull RegistrySetBuilder registryBuilder) {
         NullCheck.requireNonNull(registryBuilder, "registryBuilder");
         this.registryConfigurations.forEach(c -> c.accept(registryBuilder));
@@ -266,7 +307,7 @@ public final class DataGeneratorCollectors {
     /**
      * Selects the readable stores required by a {@link DataGeneratorCollectors} instance.
      *
-     * <p>All three holders must be supplied before {@link #build()}, even when only
+     * <p>All four holders must be supplied before {@link #build()}, even when only
      * one provider category will be used. The builder owns one collector and
      * returns that same instance on each successful build. Holder references
      * are assigned directly and are not copied or frozen.</p>
@@ -338,6 +379,16 @@ public final class DataGeneratorCollectors {
             return this;
         }
 
+        /**
+         * Selects the metadata holder used by villager trade data generation.
+         *
+         * <p>The reference replaces the previous selection. A {@code null}
+         * selection is rejected when {@link #build()} validates the configuration.</p>
+         *
+         * @param tradesHolder the trade metadata holder; must be set before {@link #build()}
+         * @return this configuration builder
+         * @see DataGeneratorCollectors#villagerTradesProvider()
+         */
         public DataProviderConfiguration villagerTradesHolder(ReadableVillagerTradesHolder tradesHolder) {
             this.collectors.villagerTradesHolder = tradesHolder;
             return this;

@@ -3,6 +3,7 @@ package io.github.piscescup.fabricmc.impl.registers.trade;
 import io.github.piscescup.fabricmc.api.trade.VillagerLevelTradeBuilder;
 import io.github.piscescup.fabricmc.api.trade.VillagerLevelTradeMetadata;
 import io.github.piscescup.fabricmc.store.villager.trade.TradeLevel;
+import io.github.piscescup.fabricmc.utils.IdentifierUtils;
 import io.github.piscescup.util.validation.NullCheck;
 import io.github.piscescup.util.validation.StateCheck;
 import net.minecraft.core.registries.Registries;
@@ -175,7 +176,9 @@ public final class LevelTradesBuilder
     @NotNull
     public VillagerLevelTradeMetadata buildBy(Identifier professionId) {
 
-        Identifier levelId = professionId.withSuffix("/level_" + level.level());
+        Identifier levelId = IdentifierUtils.resolveSubPath(
+            professionId, "level_" + level.level()
+        );
 
         TagKey<VillagerTrade> tradeTag = TagKey.create(
             Registries.VILLAGER_TRADE,
@@ -185,8 +188,10 @@ public final class LevelTradesBuilder
         tradeMap.forEach((path, trade) -> {
             ResourceKey<VillagerTrade> villagerTradeResourceKey = ResourceKey.create(
                 Registries.VILLAGER_TRADE,
-                professionId.withSuffix(Integer.toString(level.level()))
-                    .withSuffix("/" + path)
+                IdentifierUtils.resolveSubPath(
+                    professionId,
+                    Integer.toString(level.level()), path
+                )
             );
 
             declaredTrades.put(villagerTradeResourceKey, trade);

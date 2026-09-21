@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * <p>A {@link RecipeRegistrable} receives this context when a recipe data
  * provider asks it to save. The context keeps recipe definitions independent
- * of the concrete Fabric provider while still allowing them to resolve holders
+ * of the concrete Fabric provider while still allowing them to resolveSubPath holders
  * from any available {@link Registry}.</p>
  *
  * @author REN YuanTong

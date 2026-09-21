@@ -292,10 +292,6 @@ public final class DataGeneratorCollectors {
     /**
      * Adds the queued dynamic-registry bootstraps to Fabric's registry builder.
      *
-     * <p>Invoke this method from the data-generator entrypoint's registry-building
-     * hook after selecting {@link #villagerTradesProvider()}. The queue is
-     * retained, so each call applies all configured bootstraps again.</p>
-     *
      * @param registryBuilder the registry builder receiving the queued bootstraps
      * @throws NullPointerException if {@code registryBuilder} is {@code null}
      */

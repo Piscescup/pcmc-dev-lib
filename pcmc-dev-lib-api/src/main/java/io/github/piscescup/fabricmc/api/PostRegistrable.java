@@ -2,6 +2,7 @@ package io.github.piscescup.fabricmc.api;
 
 import io.github.piscescup.fabricmc.api.tag.TagKeyPostRegistrable;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
+import io.github.piscescup.fabricmc.store.RegistrationMetadata;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.NotNull;
@@ -61,6 +62,16 @@ public interface PostRegistrable<V, T extends V, POST extends PostRegistrable<V,
      */
     @NotNull
     POST translate(@NotNull MCLanguage lang, @NotNull String translation);
+    /**
+     * Returns the {@link RegistrationMetadata metadata} associated with the registered entry.
+     *
+     * <p>The returned metadata contains the registered entry, its identifier,
+     * its resource key.</p>
+     *
+     * @return the metadata of the registered entry
+     * @see RegistrationMetadata
+     */
+    RegistrationMetadata<V, T> registrationMetadata();
 
     /**
      * Returns the registered object.
@@ -72,7 +83,9 @@ public interface PostRegistrable<V, T extends V, POST extends PostRegistrable<V,
      * @see PreRegistrable#register()
      */
     @NotNull
-    T get();
+    default T get() {
+        return registrationMetadata().entry();
+    }
 
     /**
      * Returns the namespaced {@link Identifier} of the registered object.
@@ -84,7 +97,9 @@ public interface PostRegistrable<V, T extends V, POST extends PostRegistrable<V,
      * @see #resourceKey()
      */
     @NotNull
-    Identifier identifier();
+    default Identifier identifier() {
+        return registrationMetadata().identifier();
+    }
 
     /**
      * Returns the {@link ResourceKey} of the registered object.
@@ -100,7 +115,9 @@ public interface PostRegistrable<V, T extends V, POST extends PostRegistrable<V,
      * @see #identifier()
      */
     @NotNull
-    ResourceKey<V> resourceKey();
+    default ResourceKey<V> resourceKey() {
+        return registrationMetadata().resourceKey();
+    }
 
     /**
      * Adds the registered object to a {@link Collection}.

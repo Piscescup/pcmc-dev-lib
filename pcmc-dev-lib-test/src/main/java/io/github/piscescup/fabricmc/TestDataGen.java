@@ -3,7 +3,7 @@ package io.github.piscescup.fabricmc;
 
 import io.github.piscescup.fabricmc.constants.MCLanguage;
 import io.github.piscescup.fabricmc.datagen.DataGeneratorCollectors;
-import io.github.piscescup.fabricmc.impl.store.MutableReciperegistrablesHolder;
+import io.github.piscescup.fabricmc.impl.store.recipe.MutableReciperegistrablesHolder;
 import io.github.piscescup.fabricmc.impl.store.lang.MutableTranslationsHolder;
 import io.github.piscescup.fabricmc.impl.store.tag.MutableTagKeysHolder;
 import io.github.piscescup.fabricmc.impl.store.village.trade.MutableVillagerTradeHolder;

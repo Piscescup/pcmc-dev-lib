@@ -1,4 +1,4 @@
-package io.github.piscescup.fabricmc.impl.store;
+package io.github.piscescup.fabricmc.impl.store.recipe;
 
 import io.github.piscescup.fabricmc.api.recipe.RecipeRegistrable;
 import io.github.piscescup.fabricmc.store.recipe.ReadableRecipeRegistrablesHolder;

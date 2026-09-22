@@ -3,7 +3,7 @@ package io.github.piscescup.fabricmc.impl.registers.trade;
 import io.github.piscescup.fabricmc.api.trade.VillagerLevelTradeBuilder;
 import io.github.piscescup.fabricmc.api.trade.VillagerLevelTradeMetadata;
 import io.github.piscescup.fabricmc.store.villager.trade.TradeLevel;
-import io.github.piscescup.fabricmc.utils.IdentifierUtils;
+import io.github.piscescup.fabricmc.utils.resource.IdentifierUtils;
 import io.github.piscescup.util.validation.NullCheck;
 import io.github.piscescup.util.validation.StateCheck;
 import net.minecraft.core.registries.Registries;

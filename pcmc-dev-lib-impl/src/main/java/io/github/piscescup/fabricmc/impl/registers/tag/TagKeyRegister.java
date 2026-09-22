@@ -3,8 +3,10 @@ package io.github.piscescup.fabricmc.impl.registers.tag;
 import io.github.piscescup.fabricmc.api.tag.TagKeyPostRegistrable;
 import io.github.piscescup.fabricmc.api.tag.TagKeyPreRegistrable;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
+import io.github.piscescup.fabricmc.impl.store.ImmutableRegistrationMetadata;
 import io.github.piscescup.fabricmc.impl.store.lang.MutableTranslationsHolder;
 import io.github.piscescup.fabricmc.impl.store.tag.MutableTagKeysHolder;
+import io.github.piscescup.fabricmc.store.RegistrationMetadata;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
@@ -104,27 +106,6 @@ public class TagKeyRegister<T>
         );
         return this;
     }
-
-    /**
-     * Returns the {@link TagKey} created when this declaration was constructed.
-     *
-     * @return the declared tag key
-     */
-    @Override
-    public @NonNull TagKey<T> get() {
-        return tagKey;
-    }
-
-    /**
-     * Returns the namespaced {@link Identifier} of the declared {@link TagKey}.
-     *
-     * @return the tag identifier
-     */
-    @Override
-    public @NotNull Identifier identifier() {
-        return id;
-    }
-
 
     /**
      * Records an optional member {@link Identifier} in {@link MutableTagKeysHolder#INSTANCE}.
@@ -232,5 +213,10 @@ public class TagKeyRegister<T>
     @Override
     public ResourceKey<? extends Registry<T>> tagResourceKey() {
         return registryKey;
+    }
+
+    @Override
+    public RegistrationMetadata<TagKey<T>, TagKey<T>> registrationMetadata() {
+        return new ImmutableRegistrationMetadata<>(this.id, null, this.tagKey);
     }
 }

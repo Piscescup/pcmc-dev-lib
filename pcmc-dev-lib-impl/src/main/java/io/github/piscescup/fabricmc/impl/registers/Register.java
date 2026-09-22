@@ -3,7 +3,9 @@ package io.github.piscescup.fabricmc.impl.registers;
 import io.github.piscescup.fabricmc.api.PostRegistrable;
 import io.github.piscescup.fabricmc.api.PreRegistrable;
 import io.github.piscescup.fabricmc.constants.MCLanguage;
+import io.github.piscescup.fabricmc.impl.store.ImmutableRegistrationMetadata;
 import io.github.piscescup.fabricmc.impl.store.lang.MutableTranslationsHolder;
+import io.github.piscescup.fabricmc.store.RegistrationMetadata;
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
@@ -165,38 +167,14 @@ public abstract class Register<
         return (POST) this;
     }
 
-    /**
-     * Returns the {@link ResourceKey} established when this builder was constructed.
-     *
-     * @return the key combining the target registry and entry identifier
-     */
+
     @Override
-    public @NotNull ResourceKey<V> resourceKey() {
-        return resourceKey;
+    public RegistrationMetadata<V, T> registrationMetadata() {
+        return new ImmutableRegistrationMetadata<>(
+            this.id,
+            this.resourceKey,
+            this.thingToBeRegistered
+        );
     }
 
-    /**
-     * Returns the {@link Identifier} selected for this registration.
-     *
-     * @return the namespaced entry identifier
-     */
-    @Override
-    public @NotNull Identifier identifier() {
-        return id;
-    }
-
-    /**
-     * Returns the registration result stored by the subclass.
-     *
-     * <p>Call this method only after registration has completed successfully.
-     * It directly reads the result field and does not perform a registry lookup
-     * or validate the builder's current stage.</p>
-     *
-     * @return the registered instance, retaining its concrete type; the current
-     *         implementation returns {@code null} until the result field is assigned
-     */
-    @Override
-    public @NonNull T get() {
-        return thingToBeRegistered;
-    }
 }

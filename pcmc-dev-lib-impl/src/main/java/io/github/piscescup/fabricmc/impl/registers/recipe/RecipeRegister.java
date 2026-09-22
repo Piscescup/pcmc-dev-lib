@@ -1,7 +1,7 @@
 package io.github.piscescup.fabricmc.impl.registers.recipe;
 
 import io.github.piscescup.fabricmc.api.recipe.RecipeRegistrable;
-import io.github.piscescup.fabricmc.impl.store.MutableReciperegistrablesHolder;
+import io.github.piscescup.fabricmc.impl.store.recipe.MutableReciperegistrablesHolder;
 import net.minecraft.advancements.triggers.Criterion;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;

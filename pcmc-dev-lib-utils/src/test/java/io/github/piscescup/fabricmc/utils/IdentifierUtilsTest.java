@@ -1,5 +1,6 @@
 package io.github.piscescup.fabricmc.utils;
 
+import io.github.piscescup.fabricmc.utils.resource.IdentifierUtils;
 import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

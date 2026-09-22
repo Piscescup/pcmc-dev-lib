@@ -1,4 +1,4 @@
-package io.github.piscescup.fabricmc.utils;
+package io.github.piscescup.fabricmc.utils.resource;
 
 import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.resources.Identifier;

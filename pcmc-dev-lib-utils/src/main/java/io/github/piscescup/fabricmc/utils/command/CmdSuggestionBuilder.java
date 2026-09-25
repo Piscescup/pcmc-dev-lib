@@ -4,11 +4,13 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.github.piscescup.util.validation.NullCheck;
+import net.minecraft.commands.CommandSourceStack;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Collects command suggestions and adds them to a Brigadier
@@ -35,6 +37,12 @@ public final class CmdSuggestionBuilder<S> {
     @Contract(" -> new")
     @NotNull
     public static <S> CmdSuggestionBuilder<S> create() {
+        return new CmdSuggestionBuilder<>();
+    }
+
+    @Contract(" -> new")
+    @NotNull
+    public static CmdSuggestionBuilder<CommandSourceStack> createByCommandSourceStack() {
         return new CmdSuggestionBuilder<>();
     }
 
@@ -135,7 +143,7 @@ public final class CmdSuggestionBuilder<S> {
      */
     public CmdSuggestionBuilder<S> suggest(@NotNull final String suggestion) {
         NullCheck.requireNonNull(suggestion, "suggestion");
-        this.suggestions.add(suggestion);
+        this.suggestions.add(suggestion.replace(' ', '_'));
         return this;
     }
 
@@ -152,27 +160,44 @@ public final class CmdSuggestionBuilder<S> {
      */
     public <T> CmdSuggestionBuilder<S> suggest(@NotNull final T suggestion) {
         NullCheck.requireNonNull(suggestion, "suggestion");
-        this.suggestions.add(suggestion.toString());
+
+        String result = suggestion instanceof CommandSuggestible suggestible?
+            suggestible.toSuggestionString() :
+            suggestion.toString();
+
+        this.suggest(result);
         return this;
     }
 
     /**
-     * Adds a custom suggestion using
-     * {@link CommandSuggestible#toSuggestionString()}.
+     * Adds each element from the given stream as a suggestion.
+     * Each element is converted using {@link #suggest(Object)}.
+     * This operation consumes the stream.
      *
-     * @param suggestion the value to convert and add
-     * @param <T> the type of the custom suggestion
+     * @param suggestions the stream of values to suggest
+     * @param <T> the type of values in the stream
      * @return this builder
-     * @throws NullPointerException if {@code suggestion} is {@code null}
+     * @throws NullPointerException if {@code suggestions} is {@code null}
      */
-    public <T extends CommandSuggestible> CmdSuggestionBuilder<S> suggestCustom(
-        @NotNull final T suggestion
+    public <T> CmdSuggestionBuilder<S> suggest(
+        @NotNull final Stream<T> suggestions
     ) {
-        NullCheck.requireNonNull(suggestion, "suggestion");
-        this.suggestions.add(suggestion.toSuggestionString());
+        NullCheck.requireNonNull(suggestions, "suggestions");
+        suggestions
+            .forEach(this::suggest);
+
         return this;
     }
 
+    /**
+     * Adds a provider that generates suggestions from the {@link CommandContext}.
+     * The provider is called when suggestions are requested.
+     *
+     * @param suggestionProvider a function that returns values to suggest
+     *                           for the given command context
+     * @return this builder
+     * @throws NullPointerException if {@code suggestionProvider} is {@code null}
+     */
     public CmdSuggestionBuilder<S> suggestDynamic(
         @NotNull final Function<CommandContext<S>, ? extends Iterable<?>> suggestionProvider
     ) {
@@ -194,27 +219,15 @@ public final class CmdSuggestionBuilder<S> {
      * @return this builder
      * @throws NullPointerException if {@code suggestion} is {@code null}
      */
-    public <E extends Enum<E>> CmdSuggestionBuilder<S> suggestEnum(
+    public <E extends Enum<E>> CmdSuggestionBuilder<S> suggest(
         @NotNull final E suggestion
     ) {
         NullCheck.requireNonNull(suggestion, "suggestion");
-        this.suggestions.add(suggestion.name().toLowerCase(Locale.ROOT));
-        return this;
-    }
+        String result = suggestion instanceof CommandSuggestible suggestible?
+            suggestible.toSuggestionString() :
+            suggestion.name().toLowerCase(Locale.ROOT);
 
-    /**
-     * Adds an enum constant using
-     * {@link CommandSuggestible#toSuggestionString()}.
-     *
-     * @param suggestion the enum constant to convert and add
-     * @param <E> the enum type, which must implement {@link CommandSuggestible}
-     * @return this builder
-     * @throws NullPointerException if {@code suggestion} is {@code null}
-     */
-    public <E extends Enum<E> & CommandSuggestible> CmdSuggestionBuilder<S>
-    suggestEnumCustom(@NotNull final E suggestion) {
-        NullCheck.requireNonNull(suggestion, "suggestion");
-        this.suggestions.add(suggestion.toSuggestionString());
+        this.suggest(result);
         return this;
     }
 
@@ -222,42 +235,22 @@ public final class CmdSuggestionBuilder<S> {
      * Adds every constant of the specified enum type using its name converted
      * to lowercase.
      *
-     * @param suggestion the enum class whose constants will be added
+     * @param suggestions the enum class whose constants will be added
      * @param <E> the enum type
      * @return this builder
-     * @throws NullPointerException if {@code suggestion} is {@code null}
+     * @throws NullPointerException if {@code suggestions} is {@code null}
      */
-    public <E extends Enum<E>> CmdSuggestionBuilder<S> suggestEnums(
-        @NotNull final Class<E> suggestion
+    public <E extends Enum<E>> CmdSuggestionBuilder<S> suggest(
+        @NotNull final Class<E> suggestions
     ) {
-        NullCheck.requireNonNull(suggestion, "suggestion");
-        E[] enumConstants = suggestion.getEnumConstants();
-        Arrays.stream(enumConstants)
-            .map(Enum::name)
-            .map(s -> s.toLowerCase(Locale.ROOT))
-            .forEach(this.suggestions::add);
+        NullCheck.requireNonNull(suggestions, "suggestions");
+        E[] enumConstants = suggestions.getEnumConstants();
+        for (E constant : enumConstants) {
+            suggest(constant);
+        }
         return this;
     }
 
-    /**
-     * Adds every constant of the specified enum type using
-     * {@link CommandSuggestible#toSuggestionString()}.
-     *
-     * @param suggestion the enum class whose constants will be added
-     * @param <E> the enum type, which must implement {@link CommandSuggestible}
-     * @return this builder
-     * @throws NullPointerException if {@code suggestion} is {@code null}
-     */
-    public <E extends Enum<E> & CommandSuggestible> CmdSuggestionBuilder<S> suggestEnumsCustom(
-        @NotNull final Class<E> suggestion
-    ) {
-        NullCheck.requireNonNull(suggestion, "suggestion");
-        E[] enumConstants = suggestion.getEnumConstants();
-        Arrays.stream(enumConstants)
-            .map(CommandSuggestible::toSuggestionString)
-            .forEach(this.suggestions::add);
-        return this;
-    }
 
     /**
      * Adds each element's string representation as a suggestion.
@@ -274,7 +267,7 @@ public final class CmdSuggestionBuilder<S> {
     ) {
         NullCheck.requireAllNonNull(suggestions, "suggestions");
         for (final T suggestion : suggestions) {
-            this.suggestions.add(suggestion.toString());
+            suggest(suggestion);
         }
         return this;
     }
@@ -292,7 +285,7 @@ public final class CmdSuggestionBuilder<S> {
         @NotNull final Iterable<String> suggestions
     ) {
         NullCheck.requireAllNonNull(suggestions, "suggestions");
-        suggestions.forEach(this.suggestions::add);
+        suggestions.forEach(this::suggest);
         return this;
     }
 

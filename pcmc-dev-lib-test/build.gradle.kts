@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":pcmc-dev-lib-api"))
     implementation(project(":pcmc-dev-lib-impl"))
     implementation(project(":pcmc-dev-lib-datagen"))
+    api(project(":pcmc-dev-lib-utils"))
 }
 
 tasks.test {

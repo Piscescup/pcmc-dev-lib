@@ -17,6 +17,38 @@ public final class CommandFeedback {
     private CommandFeedback() {}
 
     /**
+     * Sends a success message to the command source and requests that it be
+     * broadcast to administrators.
+     *
+     * @param context the command context
+     * @param message the message to send
+     * @throws NullPointerException if {@code context} is {@code null}
+     */
+    public static void literalOnBroadcast(
+        final @NotNull CommandContext<CommandSourceStack> context,
+        final Component message
+    ) {
+        NullCheck.requireNonNull(context, "context");
+        context.getSource().sendSuccess(() -> message, true);
+    }
+
+    /**
+     * Sends a success message to the command source without requesting
+     * an administrator broadcast.
+     *
+     * @param context the command context
+     * @param message the message to send
+     * @throws NullPointerException if {@code context} is {@code null}
+     */
+    public static void literalWithoutBroadcast(
+        final @NotNull CommandContext<CommandSourceStack> context,
+        final Component message
+    ) {
+        NullCheck.requireNonNull(context, "context");
+        context.getSource().sendSuccess(() -> message, false);
+    }
+
+    /**
      * Sends a successful command feedback message and requests that it also
      * be broadcast to eligible administrative recipients.
      *
@@ -47,7 +79,7 @@ public final class CommandFeedback {
      *
      * @throws NullPointerException if {@code context} is {@code null}
      */
-    public static void successSilently(
+    public static void successWithoutBroadcast(
         final @NotNull CommandContext<CommandSourceStack> context,
         final String key,
         final Object... args
